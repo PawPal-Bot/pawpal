@@ -1,7 +1,6 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { readdirSync } = require("fs");
-require("dotenv").config();
 const { ChalkAdvanced } = require("chalk-advanced");
 
 module.exports = async (client) => {
@@ -27,7 +26,7 @@ module.exports = async (client) => {
         await rest.put(Routes.applicationCommands(client.user.id), {
           body: commands,
         });
-        console.log(`${ChalkAdvanced.white("Boilerplate Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands globally")}`);
+        console.log(`${ChalkAdvanced.white("PawPal Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands globally")}`);
 
       } else {
         await rest.put(
@@ -37,7 +36,7 @@ module.exports = async (client) => {
           }
         );
 
-        console.log(`${ChalkAdvanced.white("Boilerplate Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands locally")}`);
+        console.log(`${ChalkAdvanced.white("PawPal Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands locally")}`);
       }
     } catch (err) {
       if (err) console.error(err);

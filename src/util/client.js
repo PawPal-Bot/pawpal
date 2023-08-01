@@ -6,17 +6,18 @@ const {
   Collection,
 } = require("discord.js");
 
+const ChalkAdvanced = require("chalk-advanced");
+
 require("dotenv").config();
 
+const DatabaseHandler = require("./databaseHandler");
 const EventHandler = require("./eventLoader");
 
-module.exports = class BoilerplateClient extends Client {
+module.exports = class PawPal extends Client {
   constructor(customCacheOptions = {}) {
     super({
       intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.Guilds
       ],
       makeCache: Options.cacheWithLimits({
         BaseGuildEmojiManager: 0,
@@ -37,6 +38,17 @@ module.exports = class BoilerplateClient extends Client {
 
     this.eventHandler = new EventHandler(this);
     this.eventHandler.load();
+
+    // Start the database
+    this.database = new DatabaseHandler(process.env.MONGO_URI);
+    this.database.connectToDatabase().then(() => {
+        console.log(
+            `${ChalkAdvanced.white('Would You?')} ${ChalkAdvanced.gray(
+                '>',
+            )} ${ChalkAdvanced.green('Successfully connected to the database')}`,
+        );
+    });
+
   }
 
   loginBot() {

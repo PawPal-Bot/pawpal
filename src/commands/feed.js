@@ -2,8 +2,8 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SlashCommandBuilder } = r
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Displays the clients ping"),
+    .setName("feed")
+    .setDescription("Feed your pet a treat!"),
 
   async execute(interaction, client) {
     const pingembed = new EmbedBuilder()

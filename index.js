@@ -1,11 +1,11 @@
-const BoilerplateClient = require("./src/util/client");
+const PawPal = require("./src/util/client");
 const ChalkAdvanced = require("chalk-advanced");
 
-const client = new BoilerplateClient();
+const client = new PawPal();
 
 client.loginBot().then(() => {
   console.log(
-    `${ChalkAdvanced.white("Boilerplate Bot")} ${ChalkAdvanced.gray(
+    `${ChalkAdvanced.white("PawPal Bot")} ${ChalkAdvanced.gray(
       ">"
     )} ${ChalkAdvanced.green("Bot sucessfully started. ")}`
   );

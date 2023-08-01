@@ -1,0 +1,15 @@
+{
+    "cat": 
+    [
+        "meow",
+        "purr"
+    ],  
+    "dog": [
+        "woof",
+        "bark"
+    ],
+    "redPanda": [
+        "squeak",
+        "chirp"
+    ]
+}

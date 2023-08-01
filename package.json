@@ -8,7 +8,8 @@
     "chalk-advanced": "^1.0.6",
     "discord-api-types": "^0.37.38",
     "discord.js": "^14.9.0",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "mongoose": "^7.4.1"
   },
   "devDependencies": {
     "nodemon": "2.0.20"
