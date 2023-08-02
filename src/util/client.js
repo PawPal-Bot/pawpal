@@ -11,6 +11,7 @@ const ChalkAdvanced = require("chalk-advanced");
 require("dotenv").config();
 
 const DatabaseHandler = require("./databaseHandler");
+const ButtonHandler = require("./buttonHandler");
 const EventHandler = require("./eventLoader");
 
 module.exports = class PawPal extends Client {
@@ -38,6 +39,10 @@ module.exports = class PawPal extends Client {
 
     this.eventHandler = new EventHandler(this);
     this.eventHandler.load();
+
+    // Button Loader
+    this.buttonHandler = new ButtonHandler(this);
+    this.buttonHandler.load();
 
     // Start the database
     this.database = new DatabaseHandler(process.env.MONGO_URI);

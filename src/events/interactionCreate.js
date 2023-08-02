@@ -1,5 +1,5 @@
 module.exports = (client, interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  if (interaction.isChatInputCommand()) {
   const command = client.commands.get(interaction.commandName);
   if (!command) return;
   try {
@@ -10,5 +10,17 @@ module.exports = (client, interaction) => {
       content: "An error occurred while executing that command.",
       ephemeral: true,
     });
+  }
+  } else if (interaction.isButton()) {
+    const button = client.buttons.get(interaction.customId);
+    try {
+      button.execute(interaction, client);
+    } catch (err) {
+      if (err) console.error(err);
+      interaction.reply({
+        content: "An error occurred while trying to execute this button.",
+        ephemeral: true,
+      });
+    }
   }
 };

@@ -1,16 +1,18 @@
 const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, SlashCommandBuilder } = require('discord.js');
+const userModel = require('../util/Models/userModel');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("adopt")
     .setDescription("Adopt a pet!")
+    .setDMPermission(true)
     .addSubcommand((subcommand) =>
         subcommand
             .setName("pet")
             .setDescription("Adopt a pet!")
     ),
 
-  async execute(interaction, client) {
+  async execute(interaction, client, userDb) {
     const adoptEmbed = new EmbedBuilder()
 
         .setTitle("Adopt a pet!")
@@ -19,7 +21,7 @@ module.exports = {
 // instead of a button you can use a select menu
 
     const adoptButton = new StringSelectMenuBuilder()
-        .setCustomId("adopt")
+        .setCustomId("adoptelectMenu")
         .setPlaceholder("Select a pet to adopt!")
         .addOptions([
             {
@@ -40,9 +42,17 @@ module.exports = {
                 description: "Adopt a red panda!",
                 emoji: "🐼"
             }
+  
         ])
 
+      if(userDb.petType !== 0) {
+        adoptEmbed.setDescription("You already have a pet! You can't adopt another one!");
+        adoptButton.setDisabled(true);
+      }
+
       
+
+
     await interaction.reply({
       embeds: [adoptEmbed],
         components: [new ActionRowBuilder().addComponents(adoptButton)]
