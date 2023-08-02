@@ -26,7 +26,7 @@ module.exports = async (client) => {
         await rest.put(Routes.applicationCommands(client.user.id), {
           body: commands,
         });
-        console.log(`${ChalkAdvanced.white("PawPal Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands globally")}`);
+        console.log(`${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands globally")}`);
 
       } else {
         await rest.put(
@@ -36,7 +36,7 @@ module.exports = async (client) => {
           }
         );
 
-        console.log(`${ChalkAdvanced.white("PawPal Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands locally")}`);
+        console.log(`${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(">")} ${ChalkAdvanced.green("Successfully registered commands locally")}`);
       }
     } catch (err) {
       if (err) console.error(err);

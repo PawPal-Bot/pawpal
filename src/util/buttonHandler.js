@@ -17,7 +17,7 @@ module.exports = class ButtonHandler {
             const button = require(`../buttons/${file}`);
             this.client.buttons.set(button.data.name, button);
         }
-        console.log(`${ChalkAdvanced.white('PawPal Bot')} ${ChalkAdvanced.gray('>')} ${ChalkAdvanced.green('Successfully loaded buttons')}`);
+        console.log(`${ChalkAdvanced.white('AdoptMe Bot')} ${ChalkAdvanced.gray('>')} ${ChalkAdvanced.green('Successfully loaded buttons')}`);
     }
 
     /**

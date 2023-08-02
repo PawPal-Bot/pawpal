@@ -14,7 +14,7 @@ const DatabaseHandler = require("./databaseHandler");
 const ButtonHandler = require("./buttonHandler");
 const EventHandler = require("./eventLoader");
 
-module.exports = class PawPal extends Client {
+module.exports = class AdoptMe extends Client {
   constructor(customCacheOptions = {}) {
     super({
       intents: [
@@ -48,7 +48,7 @@ module.exports = class PawPal extends Client {
     this.database = new DatabaseHandler(process.env.MONGO_URI);
         this.database.connectToDatabase().then(() => {
             console.log(
-                `${ChalkAdvanced.white('PawPal Bot')} ${ChalkAdvanced.gray(
+                `${ChalkAdvanced.white('AdoptMe Bot')} ${ChalkAdvanced.gray(
                     '>',
                 )} ${ChalkAdvanced.green('Successfully connected to the database')}`,
             );

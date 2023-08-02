@@ -1,11 +1,11 @@
-const PawPal = require("./src/util/client");
+const AdoptMe = require("./src/util/client");
 const ChalkAdvanced = require("chalk-advanced");
 
-const client = new PawPal();
+const client = new AdoptMe();
 
 client.loginBot().then(() => {
   console.log(
-    `${ChalkAdvanced.white("PawPal Bot")} ${ChalkAdvanced.gray(
+    `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
       ">"
     )} ${ChalkAdvanced.green("Bot sucessfully started. ")}`
   );
