@@ -2,7 +2,6 @@ const userModel = require("../util/Models/userModel.js");
 
 module.exports = async (client, interaction) => {
   const userDb = await client.database.getUser(interaction.user.id, true);
-
   userModel
   .findOne({ userId: interaction.user.id })
   .then(async (result) => {
@@ -25,6 +24,7 @@ module.exports = async (client, interaction) => {
       ephemeral: true,
     });
   }
+
   } else if (interaction.isButton()) {
     const button = client.buttons.get(interaction.customId);
     try {
@@ -36,5 +36,8 @@ module.exports = async (client, interaction) => {
         ephemeral: true,
       });
     }
-  }
+  } else {
+    const button = client.buttons.get(interaction.customId);
+    if (button) return button.execute(interaction, client, userDb);
+}
 };

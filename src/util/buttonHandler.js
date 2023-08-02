@@ -4,9 +4,9 @@ const { Collection } = require('discord.js');
 const { ChalkAdvanced } = require('chalk-advanced');
 
 module.exports = class ButtonHandler {
-    constructor(c) {
-        this.c = c;
-        this.c.buttons = new Collection();
+    constructor(client) {
+        this.client = client;
+        this.client.buttons = new Collection();
     }
 
     /**
@@ -15,7 +15,7 @@ module.exports = class ButtonHandler {
     load() {
         for (const file of readdirSync(path.join(__dirname, '..', 'buttons')).filter((file) => file.endsWith('.js'))) {
             const button = require(`../buttons/${file}`);
-            this.c.buttons.set(button.data.name, button);
+            this.client.buttons.set(button.data.name, button);
         }
         console.log(`${ChalkAdvanced.white('PawPal Bot')} ${ChalkAdvanced.gray('>')} ${ChalkAdvanced.green('Successfully loaded buttons')}`);
     }
@@ -24,7 +24,7 @@ module.exports = class ButtonHandler {
      * Reload the buttons
      */
     reload() {
-        this.c.buttons = new Collection();
+        this.client.buttons = new Collection();
         this.load();
     }
 };

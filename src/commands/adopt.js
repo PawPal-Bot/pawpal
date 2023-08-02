@@ -4,15 +4,23 @@ const userModel = require('../util/Models/userModel');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("adopt")
+    .setNameLocalizations({
+      de: "haustier",
+ })
     .setDescription("Adopt a pet!")
     .setDMPermission(true)
     .addSubcommand((subcommand) =>
         subcommand
             .setName("pet")
+            .setNameLocalizations({
+                de: "adoptieren",
+           })
             .setDescription("Adopt a pet!")
     ),
 
-  async execute(interaction, client, userDb) {
+  async execute(interaction, client) {
+    const userDb = await userModel.findOne({ userId: interaction.user.id });
+
     const adoptEmbed = new EmbedBuilder()
 
         .setTitle("Adopt a pet!")
@@ -45,17 +53,16 @@ module.exports = {
   
         ])
 
+
       if(userDb.petType !== 0) {
         adoptEmbed.setDescription("You already have a pet! You can't adopt another one!");
         adoptButton.setDisabled(true);
       }
 
-      
-
 
     await interaction.reply({
       embeds: [adoptEmbed],
-        components: [new ActionRowBuilder().addComponents(adoptButton)]
+        components: userDb.petType ? [] : [new ActionRowBuilder().addComponents(adoptButton)]
     });
   },
 };

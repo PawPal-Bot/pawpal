@@ -107,7 +107,7 @@ module.exports = class DatabaseHandler {
      * @returns {Promise<this.userModel|null>}
      */
     async updateUser(userID, data = {}, createIfNotFound = false) {
-        let oldData = await this.getuser(userID, createIfNotFound);
+        let oldData = await this.getUser(userID, createIfNotFound);
 
         if (oldData) {
             if (oldData?._doc) oldData = oldData?._doc;
