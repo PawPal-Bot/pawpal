@@ -21,7 +21,7 @@ module.exports = {
 // instead of a button you can use a select menu
 
     const adoptButton = new StringSelectMenuBuilder()
-        .setCustomId("adoptelectMenu")
+        .setCustomId("adoptSelectMenu")
         .setPlaceholder("Select a pet to adopt!")
         .addOptions([
             {

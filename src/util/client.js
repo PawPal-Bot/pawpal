@@ -46,13 +46,14 @@ module.exports = class PawPal extends Client {
 
     // Start the database
     this.database = new DatabaseHandler(process.env.MONGO_URI);
-    this.database.connectToDatabase().then(() => {
-        console.log(
-            `${ChalkAdvanced.white('Would You?')} ${ChalkAdvanced.gray(
-                '>',
-            )} ${ChalkAdvanced.green('Successfully connected to the database')}`,
-        );
-    });
+        this.database.connectToDatabase().then(() => {
+            console.log(
+                `${ChalkAdvanced.white('PawPal Bot')} ${ChalkAdvanced.gray(
+                    '>',
+                )} ${ChalkAdvanced.green('Successfully connected to the database')}`,
+            );
+        });
+        this.database.startSweeper();
 
   }
 

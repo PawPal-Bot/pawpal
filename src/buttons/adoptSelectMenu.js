@@ -4,8 +4,8 @@ module.exports = {
         name: 'adoptSelectMenu',
         description: 'Select menu for the adopt command',
     },
-    async execute(interaction, client, guildDb) {
-
+    async execute(interaction, client, userDb) {
+        console.log("test!!!!!!!!!!!!!!!")
         const inter = new ActionRowBuilder()
             .addComponents(
          new StringSelectMenuBuilder()

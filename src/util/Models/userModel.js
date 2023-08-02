@@ -9,12 +9,12 @@ const userProfile = new Schema(
         },
         petName: {
             type: String,
-            required: true,
+            required: false,
             unique: false
         },
         petType: {
             type: Number, // 0 for none selected yet, 1 for dog, 2 for cat, 3 for red panda
-            required: false,
+            required: true,
             default: 0,
             unique: false
         },
@@ -26,13 +26,13 @@ const userProfile = new Schema(
         },
         feedAgainAt: {
             type: Date,
-            required: false,
+            required: true,
             default: Date.now(),
             unique: false
         },
         petAgingAt: {
             type: Date,
-            required: false,
+            required: true,
             default: Date.now(),
             unique: false
         },
