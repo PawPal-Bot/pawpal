@@ -21,7 +21,7 @@ module.exports = {
         .setNameLocalizations({
           de: "adoptieren",
         })
-        .setDescription("Adopt a pet!")
+        .setDescription("Adopt a pet!"),
     ),
 
   async execute(interaction, client) {
@@ -66,7 +66,7 @@ module.exports = {
 
     if (userDb.petType !== 0) {
       adoptEmbed.setDescription(
-        "You already have a pet! You can't adopt another one!"
+        "You already have a pet! You can't adopt another one!",
       );
       adoptButton.setDisabled(true);
     }

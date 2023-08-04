@@ -11,7 +11,6 @@ module.exports = {
     description: "Select menu for the adopt command",
   },
   async execute(interaction, client, userDb) {
-
     const inter = new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId("adoptelectMenu")
@@ -38,7 +37,7 @@ module.exports = {
             description: "Adopt a red panda!",
             emoji: "🐼",
           },
-        ])
+        ]),
     );
 
     const petMap = {
@@ -51,7 +50,7 @@ module.exports = {
       .findOneAndUpdate(
         { userId: interaction.user.id },
         { petType: interaction.values[0], hasPet: true },
-        { upsert: true }
+        { upsert: true },
       )
       .exec();
 

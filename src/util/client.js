@@ -17,9 +17,7 @@ const EventHandler = require("./eventLoader");
 module.exports = class AdoptMe extends Client {
   constructor(customCacheOptions = {}) {
     super({
-      intents: [
-        GatewayIntentBits.Guilds
-      ],
+      intents: [GatewayIntentBits.Guilds],
       makeCache: Options.cacheWithLimits({
         BaseGuildEmojiManager: 0,
         GuildBanManager: 0,
@@ -46,15 +44,14 @@ module.exports = class AdoptMe extends Client {
 
     // Start the database
     this.database = new DatabaseHandler(process.env.MONGO_URI);
-        this.database.connectToDatabase().then(() => {
-            console.log(
-                `${ChalkAdvanced.white('AdoptMe Bot')} ${ChalkAdvanced.gray(
-                    '>',
-                )} ${ChalkAdvanced.green('Successfully connected to the database')}`,
-            );
-        });
-        this.database.startSweeper();
-
+    this.database.connectToDatabase().then(() => {
+      console.log(
+        `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
+          ">",
+        )} ${ChalkAdvanced.green("Successfully connected to the database")}`,
+      );
+    });
+    this.database.startSweeper();
   }
 
   loginBot() {

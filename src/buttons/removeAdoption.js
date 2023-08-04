@@ -8,7 +8,7 @@ module.exports = {
     const removeAdoptionEmbed = new EmbedBuilder()
       .setTitle("Put your pet up for adoption!")
       .setDescription(
-        "Do you really wish to put your pet up for adoption? This action cannot be undone!"
+        "Do you really wish to put your pet up for adoption? This action cannot be undone!",
       )
       .setColor("#9e38fe");
 
@@ -29,7 +29,7 @@ module.exports = {
       components: [
         new ActionRowBuilder().addComponents(
           acceptAdoptionButton,
-          declineAdoptionButton
+          declineAdoptionButton,
         ),
       ],
     });

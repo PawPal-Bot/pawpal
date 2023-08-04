@@ -1,4 +1,9 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SlashCommandBuilder } = require('discord.js');
+const {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  SlashCommandBuilder,
+} = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,19 +23,21 @@ module.exports = {
         },
         {
           name: "**Bot** latency",
-          value: `> **${Math.round(Date.now() - interaction.createdTimestamp)}**ms`,
+          value: `> **${Math.round(
+            Date.now() - interaction.createdTimestamp,
+          )}**ms`,
           inline: false,
-        }
+        },
       )
       .setTimestamp();
 
-      const button = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setLabel('Discord Ping')
-          .setStyle(5)
-          .setEmoji('💻')
-          .setURL('https://discordstatus.com/'),
-      );
+    const button = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setLabel("Discord Ping")
+        .setStyle(5)
+        .setEmoji("💻")
+        .setURL("https://discordstatus.com/"),
+    );
 
     await interaction.reply({
       embeds: [pingembed],
