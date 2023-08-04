@@ -6,12 +6,11 @@ module.exports = {
     description: "Select menu for the adopt command",
   },
   async execute(interaction, client, userDb) {
-
     await userModel
       .findOneAndUpdate(
         { userId: interaction.user.id },
         { hasPet: false, petType: 0 },
-        { upsert: true }
+        { upsert: true },
       )
       .exec();
 

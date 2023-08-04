@@ -20,11 +20,11 @@ module.exports = {
       .setDisabled(true)
       .setEmoji("❌");
 
-   await interaction.update({
+    await interaction.update({
       components: [
         new ActionRowBuilder().addComponents(
           acceptAdoptionButton,
-          declineAdoptionButton
+          declineAdoptionButton,
         ),
       ],
     });
