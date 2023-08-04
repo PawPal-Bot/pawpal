@@ -14,5 +14,19 @@
   },
   "devDependencies": {
     "nodemon": "2.0.20"
-  }
+  },
+  "name": "pawpal",
+  "description": "This template provides boilerplate code for Discord.js v14. Ready for slash command and everything you need to start out with your bot!",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mezotv/pawpal.git"
+  },
+  "author": "Dominik Koch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mezotv/pawpal/issues"
+  },
+  "homepage": "https://github.com/mezotv/pawpal#readme"
 }
