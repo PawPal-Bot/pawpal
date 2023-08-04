@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "format": "prettier --write  \"src/**/*.js\""
   },
   "dependencies": {
     "@discordjs/rest": "^1.7.0",
