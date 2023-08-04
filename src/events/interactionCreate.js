@@ -26,6 +26,7 @@ module.exports = async (client, interaction) => {
   }
 
   } else if (interaction.isButton()) {
+    if(interaction.message.interaction.user.id !== interaction.user.id) return interaction.reply({ content: "This button does not belong to you it belongs to " + interaction.message.interaction.user.username, ephemeral: true })
     const button = client.buttons.get(interaction.customId);
     try {
       button.execute(interaction, client, userDb);
@@ -37,6 +38,7 @@ module.exports = async (client, interaction) => {
       });
     }
   } else {
+    if(interaction.message.interaction.user.id !== interaction.user.id) return interaction.reply({ content: "This button does not belong to you it belongs to " + interaction.message.interaction.user.username, ephemeral: true })
     const button = client.buttons.get(interaction.customId);
     if (button) return button.execute(interaction, client, userDb);
 }
