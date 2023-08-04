@@ -1,48 +1,52 @@
+ 
+# PawPal - Virtual Pet
 
-# Discord Bot Template
+Raise a lovable red panda, a playful dog, or an adorable cat in this interactive Discord pet bot!
 
-This template provides boilerplate code for Discord.js v14. Ready for slash command and everything you need to start out with your bot!
+
+![PawPal Banner](https://imgur.com/W0AYhUf.png)
+## Requirements
+
+1. **Node.js:** Make sure you have Node.js installed on your system.
+   - Download and install Node.js from [nodejs.org](https://nodejs.org/).
+
+2. **MongoDB:** You will need a MongoDB database to store pet data.
+   - Sign up for a MongoDB account at [mongodb.com](https://www.mongodb.com/).
+   - Create a new MongoDB cluster and note down the connection string.
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/virtual-pet-bot.git
+   cd virtual-pet-bot
+   ```
+
+2. Install the necessary dependencies
+
+    ```bash
+    npm install
+    ```
+3. Create and fill out the .env file
+
+    ```bash
+    TOKEN=
+    GUILD_ID=
+    STATUS=DEVELOPMENT
+    STATUSBOT=adopt a pet
+    DISCORDSTATUS=online
+    MONGO_URI=
+    ```
+
 
 ## Deployment
 
-To use this bot follow the steps given down below.
-
-    1.  Press the big green "Use this template" button at the top of the repo.
-![UseTemplate](https://cdn.discordapp.com/attachments/926292185748496446/979030135854477322/unknown.png)
-
-    2.  Download your freshly created repo with the template code in it. 
-        We recommend using github desktop for this
-![CloneRepo](https://cdn.discordapp.com/attachments/926292185748496446/979031472000344124/unknown.png)
-
-    3. Open the Files in vscode and create a .env file based on the template given below
+Start the project using
 
 ```bash
-TOKEN= <Your bots token ofc>
-GUILD_ID= <The guild id to load slash commands on>
-STATUS=DEVELOPMENT <Change to PRODUCTION to load commands on every guild>
-STATUSBOT= <The status for your bot>
-DISCORDSTATUS=dnd <Change to whatever you want>
-```
-    4. One you filled out the .env variables open a terminal and run the following commands
-
-Running the bot in test mode:
-```bash
-npm run test
+  npm run start
 ```
 
-Running the bot in normal mode:
-```bash
-npm run start
-```
-
-## Features
-
-- Works with discord.js v14
-- Example Commands & Buttons
-- Slash command ready
-- Clean file structure
-- Fast and secure
-
-## Message from the creator
-If you use this template in your bot make sure to add me on Discord [Dominik#5555](https://discord.com/users/347077478726238228)
-I would love to check them out!
+The bot should now be running on your server and ready to interact with your Discord community.
+    
