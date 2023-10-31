@@ -14,6 +14,7 @@ const DatabaseHandler = require("./databaseHandler");
 const ButtonHandler = require("./buttonHandler");
 const EventHandler = require("./eventLoader");
 const ModalHandler = require("./modalHandler");
+const KeepAlive = require("./keepAlive");
 
 module.exports = class AdoptMe extends Client {
   constructor(customCacheOptions = {}) {
@@ -46,6 +47,10 @@ module.exports = class AdoptMe extends Client {
     // Modal Loader
     this.modalsHandler = new ModalHandler(this);
     this.modalsHandler.load();
+    
+    // Keep Alive
+    this.keepAlive = new KeepAlive(this);
+    this.keepAlive.start();
 
     // Start the database
     this.database = new DatabaseHandler(process.env.MONGO_URI);

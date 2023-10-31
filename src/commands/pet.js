@@ -73,30 +73,30 @@ module.exports = {
 
       const fieldsArray = [
         {
-          name: "Name",
+          name: "🪧 Name",
           value: userDb.petName || "You haven't chosen a name",
           inline: true,
         },
         {
-          name: "Type",
-          value: ["None", "Dog", "Cat", "Red Panda"][userDb.petType],
+          name: ["Type", "🦴 Type", "🐠 Type", "🎍 Type"][userDb.petType],
+          value: ["❌ None", "Dog", "Cat", "Red Panda"][userDb.petType],
           inline: true,
         },
-        { name: "Age", value: userDb.petAge.toString(), inline: true },
+        { name: "👶 Age", value: userDb.petAge.toString(), inline: true },
         {
-          name: "Happiness",
+          name: "❤️ Happiness",
           value: `${userDb.petHappiness}/100`,
           inline: true,
         },
-        { name: "Hungriness", value: `${userDb.petHunger}/100`, inline: true },
+        { name: "🍔 Hungriness", value: `${userDb.petHunger}/100`, inline: true },
         {
-          name: "Cleanliness",
+          name: "🛁 Cleanliness",
           value: `${userDb.petCleanliness}/100`,
           inline: true,
         },
-        { name: "Times Pat", value: userDb.patCount.toString(), inline: true },
+        { name: "🖐️ Times Pat", value: userDb.patCount.toString(), inline: true },
         {
-          name: "Last Pat",
+          name: "⏰ Last Pat",
           value:
             userDb.patTimestamps.length > 0
               ? `<t:${Math.floor(userDb.patTimestamps.slice(-1)[0] / 1000)}:R>`
@@ -104,12 +104,12 @@ module.exports = {
           inline: true,
         },
         {
-          name: "Times Fed",
+          name: "🥄 Times Fed",
           value: userDb.feedCount.toString(),
           inline: true,
         },
         {
-          name: "Last Fed",
+          name: "⏰ Last Fed",
           value:
             userDb.feedTimestamps.length > 0
               ? `<t:${Math.floor(userDb.feedTimestamps.slice(-1)[0] / 1000)}:R>`
