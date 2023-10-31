@@ -7,6 +7,6 @@ client.loginBot().then(() => {
   console.log(
     `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
       ">"
-    )} ${ChalkAdvanced.green("Bot sucessfully started. ")}`
+    )} ${ChalkAdvanced.green("Bot successfully started. ")}`
   );
 });
