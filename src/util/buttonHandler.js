@@ -12,41 +12,25 @@ module.exports = class ButtonHandler {
   /**
    * Load the buttons
    */
-  async load() {
-    const buttonDir = path.resolve(__dirname, "..", "buttons");
-    try {
-      for (const file of readdirSync(buttonDir).filter((file) =>
-        file.endsWith(".js")
-      )) {
-        try {
-          const button = await import(path.resolve(buttonDir, file));
-          const buttonDefault = button.default;
-          this.client.buttons.set(buttonDefault.data.name, buttonDefault);
-        } catch (err) {
-          console.error(
-            `${ChalkAdvanced.red("Error loading button from file:")} ${file}`,
-            err
-          );
-        }
-      }
-      console.log(
-        `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-          ">"
-        )} ${ChalkAdvanced.green("Successfully loaded buttons")}`
-      );
-    } catch (err) {
-      console.error(
-        `${ChalkAdvanced.red("Error reading buttons directory:")}`,
-        err
-      );
+  load() {
+    for (const file of readdirSync(
+      path.join(__dirname, "..", "buttons")
+    ).filter((file) => file.endsWith(".js"))) {
+      const button = require(`../buttons/${file}`);
+      this.client.buttons.set(button.data.name, button);
     }
+    console.log(
+      `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
+        ">"
+      )} ${ChalkAdvanced.green("Successfully loaded buttons")}`
+    );
   }
 
   /**
    * Reload the buttons
    */
-  async reload() {
+  reload() {
     this.client.buttons = new Collection();
-    await this.load();
+    this.load();
   }
 };
