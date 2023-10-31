@@ -13,6 +13,7 @@ require("dotenv").config();
 const DatabaseHandler = require("./databaseHandler");
 const ButtonHandler = require("./buttonHandler");
 const EventHandler = require("./eventLoader");
+const ModalHandler = require("./modalHandler");
 
 module.exports = class AdoptMe extends Client {
   constructor(customCacheOptions = {}) {
@@ -41,6 +42,10 @@ module.exports = class AdoptMe extends Client {
     // Button Loader
     this.buttonHandler = new ButtonHandler(this);
     this.buttonHandler.load();
+
+    // Modal Loader
+    this.modalsHandler = new ModalHandler(this);
+    this.modalsHandler.load();
 
     // Start the database
     this.database = new DatabaseHandler(process.env.MONGO_URI);

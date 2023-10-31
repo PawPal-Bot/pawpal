@@ -40,7 +40,7 @@ module.exports = async (client, interaction) => {
         ephemeral: true,
       });
     }
-  } else {
+  } else if (interaction.isButton()) {
     if (interaction.message.interaction.user.id !== interaction.user.id)
       return interaction.reply({
         content:
@@ -49,6 +49,14 @@ module.exports = async (client, interaction) => {
         ephemeral: true,
       });
     const button = client.buttons.get(interaction.customId);
-    if (button) return button.execute(interaction, client, userDb);
+    try {
+      button.execute(interaction, client, userDb);
+    } catch (err) {
+      if (err) console.error(err);
+      interaction.reply({
+        content: "An error occurred while trying to execute this button.",
+        ephemeral: true,
+      });
+    }
   }
 };
