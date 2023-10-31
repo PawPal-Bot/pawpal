@@ -44,17 +44,34 @@ module.exports = class AdoptMe extends Client {
 
     // Start the database
     this.database = new DatabaseHandler(process.env.MONGO_URI);
-    this.database.connectToDatabase().then(() => {
-      console.log(
-        `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-          ">",
-        )} ${ChalkAdvanced.green("Successfully connected to the database")}`,
-      );
-    });
-    this.database.startSweeper();
+
+    this.database
+      .connectToDatabase()
+      .then(() => {
+        console.log(
+          `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
+            ">"
+          )} ${ChalkAdvanced.green("Successfully connected to the database")}`
+        );
+        this.database.startSweeper();
+      })
+      .catch((error) => {
+        console.error(
+          `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
+            ">"
+          )} ${ChalkAdvanced.red("Failed to connect to the database:")} ${
+            error.message
+          }`
+        );
+        process.exit(1);
+      });
   }
 
-  loginBot() {
-    return this.login(process.env.TOKEN);
+  async loginBot() {
+    try {
+      await this.login(process.env.TOKEN);
+    } catch (error) {
+      console.error(`${ChalkAdvanced.red("Error logging in:")}`, error);
+    }
   }
 };

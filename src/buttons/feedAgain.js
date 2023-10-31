@@ -1,24 +1,15 @@
-const {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  SlashCommandBuilder,
-} = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("feed")
-    .setDescription("Feed your pet a treat!"),
-
+  data: {
+    name: "feedAgain",
+    description: "Button for feeding the pet again",
+  },
   async execute(interaction, client) {
-    const userDb = await userModel.findOne({ userId: interaction.user.id });
-
-    if (!userDb || userDb.petType === 0) {
-      await interaction.reply("You don't have a pet to feed!");
-      return;
-    }
+    await interaction.deferUpdate();
+    let userDb = await userModel.findOne({ userId: interaction.user.id });
 
     const petName = userDb.petName ? userDb.petName : "Your pet";
 
@@ -31,7 +22,7 @@ module.exports = {
         )
         .setTimestamp();
 
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [tooFullEmbed],
         components: [],
       });
@@ -53,9 +44,9 @@ module.exports = {
         Math.floor(Math.random() * speechBubbles.eatingSounds.length)
       ];
 
-    const feedEmbed = new EmbedBuilder()
+    const updatedFeedEmbed = new EmbedBuilder()
       .setColor("#9e38fe")
-      .setTitle(`You fed ${petName} a treat!`)
+      .setTitle(`You fed ${petName} a treat again!`)
       .setDescription(
         `${randomPetSound}! ${petName} ${randomEatingSound}s the treat happily!`
       )
@@ -66,11 +57,9 @@ module.exports = {
       .setLabel("Feed Again")
       .setStyle("Primary");
 
-    const actionRow = new ActionRowBuilder().addComponents(feedAgainButton);
-
-    await interaction.reply({
-      embeds: [feedEmbed],
-      components: [actionRow],
+    await interaction.editReply({
+      embeds: [updatedFeedEmbed],
+      components: [new ActionRowBuilder().addComponents(feedAgainButton)],
     });
   },
 };

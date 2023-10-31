@@ -1,15 +1,6 @@
 {
-    "cat": 
-    [
-        "meow",
-        "purr"
-    ],  
-    "dog": [
-        "woof",
-        "bark"
-    ],
-    "redPanda": [
-        "squeak",
-        "chirp"
-    ]
+  "cat": ["meow", "purr", "hiss", "yowl", "chirrup"],
+  "dog": ["woof", "bark", "growl", "howl", "whine"],
+  "redPanda": ["squeak", "chirp", "click", "trill"],
+  "eatingSounds": ["chomp", "chew", "munch", "slurp", "gulp"]
 }

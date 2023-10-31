@@ -13,7 +13,7 @@ module.exports = {
   async execute(interaction, client) {
     const pingembed = new EmbedBuilder()
 
-      .setColor("#5865f4")
+      .setColor("#9e38fe")
       .setTitle(":ping_pong:  Pong!")
       .addFields(
         {
@@ -24,10 +24,10 @@ module.exports = {
         {
           name: "**Bot** latency",
           value: `> **${Math.round(
-            Date.now() - interaction.createdTimestamp,
+            Date.now() - interaction.createdTimestamp
           )}**ms`,
           inline: false,
-        },
+        }
       )
       .setTimestamp();
 
@@ -36,7 +36,7 @@ module.exports = {
         .setLabel("Discord Ping")
         .setStyle(5)
         .setEmoji("💻")
-        .setURL("https://discordstatus.com/"),
+        .setURL("https://discordstatus.com/")
     );
 
     await interaction.reply({

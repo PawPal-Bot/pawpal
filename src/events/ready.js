@@ -5,7 +5,7 @@ const { ChalkAdvanced } = require("chalk-advanced");
 
 module.exports = async (client) => {
   const commandFiles = readdirSync("./src/commands/").filter((file) =>
-    file.endsWith(".js"),
+    file.endsWith(".js")
   );
 
   const commands = [];
@@ -20,7 +20,7 @@ module.exports = async (client) => {
     version: "10",
   }).setToken(process.env.TOKEN);
 
-  (async () => {
+  const registerCommands = async () => {
     try {
       if (process.env.STATUS === "PRODUCTION") {
         await rest.put(Routes.applicationCommands(client.user.id), {
@@ -28,31 +28,38 @@ module.exports = async (client) => {
         });
         console.log(
           `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-            ">",
+            ">"
           )} ${ChalkAdvanced.green(
-            "Successfully registered commands globally",
-          )}`,
+            "Successfully registered commands globally"
+          )}`
         );
       } else {
         await rest.put(
           Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID),
           {
             body: commands,
-          },
+          }
         );
 
         console.log(
           `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-            ">",
-          )} ${ChalkAdvanced.green(
-            "Successfully registered commands locally",
-          )}`,
+            ">"
+          )} ${ChalkAdvanced.green("Successfully registered commands locally")}`
         );
       }
     } catch (err) {
-      if (err) console.error(err);
+      if (err && err.request && err.response) {
+        console.error(
+          `HTTP error: ${err.response.status} ${err.response.statusText}`
+        );
+      } else {
+        console.error(err);
+      }
     }
-  })();
+  };
+
+  await registerCommands();
+
   client.user.setPresence({
     activities: [{ name: `${process.env.STATUSBOT}` }],
     status: `${process.env.DISCORDSTATUS}`,

@@ -4,44 +4,50 @@ const {
   ButtonBuilder,
   SlashCommandBuilder,
 } = require("discord.js");
+const userModel = require("../util/Models/userModel");
+const speechBubbles = require("../data/speechbubbles.json");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("pat")
-    .setDescription("Feed your pet a treat!"),
+    .setDescription("Pat your pet!"),
 
   async execute(interaction, client) {
-    const pingembed = new EmbedBuilder()
+    await interaction.deferReply();
 
-      .setColor("#5865f4")
-      .setTitle(":ping_pong:  Pong!")
-      .addFields(
-        {
-          name: "**Api** latency",
-          value: `> **${Math.round(client.ws.ping)}**ms`,
-          inline: false,
-        },
-        {
-          name: "**Bot** latency",
-          value: `> **${Math.round(
-            Date.now() - interaction.createdTimestamp,
-          )}**ms`,
-          inline: false,
-        },
-      )
+    const userDb = await userModel.findOne({ userId: interaction.user.id });
+
+    if (!userDb || userDb.petType === 0) {
+      await interaction.editReply("You don't have a pet to pat!");
+      return;
+    }
+
+    if (userDb.petHappiness >= 100) {
+      await interaction.editReply("Your pet can't get any happier!");
+      return;
+    }
+
+    const petTypeStr = ["none", "dog", "cat", "redPanda"][userDb.petType];
+    const randomSound =
+      speechBubbles[petTypeStr][
+        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
+      ];
+
+    const patEmbed = new EmbedBuilder()
+      .setColor("#9e38fe")
+      .setTitle("Pat your pet!")
+      .setDescription(`${randomSound}! Give your pet some love.`)
+      .setFooter({ text: `Happiness: ${userDb.petHappiness}/100` })
       .setTimestamp();
 
-    const button = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setLabel("Discord Ping")
-        .setStyle(5)
-        .setEmoji("💻")
-        .setURL("https://discordstatus.com/"),
-    );
+    const patButton = new ButtonBuilder()
+      .setCustomId("pat")
+      .setLabel("Pat")
+      .setStyle("Primary");
 
-    await interaction.reply({
-      embeds: [pingembed],
-      components: [button],
+    await interaction.editReply({
+      embeds: [patEmbed],
+      components: [new ActionRowBuilder().addComponents(patButton)],
     });
   },
 };
