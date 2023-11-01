@@ -292,3 +292,5 @@ module.exports = {
     }
   },
 };
+
+/* to fix walk and run, to ensure it can only be used once per hour */
