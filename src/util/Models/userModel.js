@@ -1,8 +1,19 @@
 const { Schema, model } = require("mongoose");
 
+const generateUniquePetId = () => {
+  const randomNum = Math.floor(Math.random() * 1000000);
+  const timestamp = Date.now();
+  return Number(`${randomNum}${timestamp}`);
+};
+
 const userProfile = new Schema(
   {
     userId: { type: Number, required: true, unique: true },
+    petId: {
+      type: Number,
+      default: generateUniquePetId(),
+      unique: true,
+    },
     petName: {
       type: String,
       default: "",
@@ -26,13 +37,18 @@ const userProfile = new Schema(
     sleepLevel: { type: Number, default: 100 },
     educationLevel: { type: Number, default: 0 },
     affection: { type: Number, default: 50 },
-    accessories: { type: Array, default: [] },
-    housingCustomisations: { type: Array, default: [] },
     miniGameScores: { type: Object, default: {} },
+    patCount: { type: Number, default: 0 },
+    cuddleCount: { type: Number, default: 0 },
+    feedCount: { type: Number, default: 0 },
+    drinkCount: { type: Number, default: 0 },
+    cleanedCount: { type: Number, default: 0 },
     socialisation: {
       friends: { type: Array, default: [] },
       competitionsEntered: { type: Number, default: 0 },
     },
+    accessories: { type: Array, default: [] },
+    housingCustomisations: { type: Array, default: [] },
     actionTimestamps: {
       lastFed: { type: [Date], default: [] },
       lastDrank: { type: [Date], default: [] },
@@ -40,17 +56,11 @@ const userProfile = new Schema(
       lastMedicine: { type: [Date], default: [] },
       lastPlayed: { type: [Date], default: [] },
       lastEducated: { type: [Date], default: [] },
+      lastRan: { type: [Date], default: [] },
       lastWalked: { type: [Date], default: [] },
       lastPat: { type: [Date], default: [] },
+      lastCuddled: { type: [Date], default: [] },
     },
-    patCount: { type: Number, default: 0 },
-    patTimestamps: { type: [Date], default: [] },
-    feedCount: { type: Number, default: 0 },
-    feedTimestamps: { type: [Date], default: [] },
-    drinkCount: { type: Number, default: 0 },
-    drinkTimestamps: { type: [Date], default: [] },
-    cleanedCount: { type: Number, default: 0 },
-    cleanedTimestamps: { type: [Date], default: [] },
   },
   { timestamps: true }
 );
