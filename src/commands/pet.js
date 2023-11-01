@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+} = require("discord.js");
 const userModel = require("../util/Models/userModel");
 
 module.exports = {
@@ -20,6 +25,14 @@ module.exports = {
       subcommand
         .setName("about")
         .setDescription("Get detailed information about your pet")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("release")
+        .setDescription("Release your pet back into the wild")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("adopt").setDescription("Get started with PawPal!")
     ),
 
   async execute(interaction) {
@@ -151,8 +164,10 @@ module.exports = {
         {
           name: "⏰ Last Pat",
           value:
-            userDb.patTimestamps.length > 0
-              ? `<t:${Math.floor(userDb.patTimestamps.slice(-1)[0] / 1000)}:R>`
+            userDb.actionTimestamps.lastPat.length > 0
+              ? `<t:${Math.floor(
+                  userDb.actionTimestamps.lastPat.slice(-1)[0].getTime() / 1000
+                )}:R>`
               : "Never",
           inline: true,
         },
@@ -164,8 +179,10 @@ module.exports = {
         {
           name: "⏰ Last Fed",
           value:
-            userDb.feedTimestamps.length > 0
-              ? `<t:${Math.floor(userDb.feedTimestamps.slice(-1)[0] / 1000)}:R>`
+            userDb.actionTimestamps.lastFed.length > 0
+              ? `<t:${Math.floor(
+                  userDb.actionTimestamps.lastFed.slice(-1)[0].getTime() / 1000
+                )}:R>`
               : "Never",
           inline: true,
         },
@@ -177,9 +194,10 @@ module.exports = {
         {
           name: "⏰ Last Drank",
           value:
-            userDb.drinkTimestamps.length > 0
+            userDb.actionTimestamps.lastDrank.length > 0
               ? `<t:${Math.floor(
-                  userDb.drinkTimestamps.slice(-1)[0] / 1000
+                  userDb.actionTimestamps.lastDrank.slice(-1)[0].getTime() /
+                    1000
                 )}:R>`
               : "Never",
           inline: true,
@@ -192,9 +210,10 @@ module.exports = {
         {
           name: "⏰ Last Cleaned",
           value:
-            userDb.cleanedTimestamps.length > 0
+            userDb.actionTimestamps.lastCleaned.length > 0
               ? `<t:${Math.floor(
-                  userDb.cleanedTimestamps.slice(-1)[0] / 1000
+                  userDb.actionTimestamps.lastCleaned.slice(-1)[0].getTime() /
+                    1000
                 )}:R>`
               : "Never",
           inline: true,
@@ -219,6 +238,156 @@ module.exports = {
         .setColor("#9e38fe");
 
       await interaction.reply({ embeds: [petInfoEmbed] });
+    } else if (subcommand === "release") {
+      const userDb = await userModel.findOne({ userId: interaction.user.id });
+
+      if (!userDb || userDb.petType === 0) {
+        await interaction.reply({
+          content:
+            "You don't have a pet to release. Run </get started:1168885856032014448> to adopt one",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      try {
+        await userModel
+          .findOneAndUpdate(
+            { userId: interaction.user.id },
+            {
+              $set: {
+                petName: "",
+                petType: 0,
+                hasPet: false,
+                lifeStage: 0,
+                age: 0,
+                health: 100,
+                isSick: false,
+                medicineCount: 0,
+                discipline: 0,
+                trainingLevel: 0,
+                happiness: 50,
+                energy: 100,
+                hunger: 50,
+                thirst: 50,
+                cleanliness: 50,
+                exerciseLevel: 0,
+                sleepLevel: 100,
+                educationLevel: 0,
+                affection: 50,
+                miniGameScores: {},
+                patCount: 0,
+                feedCount: 0,
+                drinkCount: 0,
+                cleanedCount: 0,
+                socialisation: {
+                  friends: [],
+                  competitionsEntered: 0,
+                },
+                accessories: [],
+                housingCustomisations: [],
+                actionTimestamps: {
+                  lastFed: [],
+                  lastDrank: [],
+                  lastCleaned: [],
+                  lastMedicine: [],
+                  lastPlayed: [],
+                  lastEducated: [],
+                  lastWalked: [],
+                  lastPat: [],
+                },
+              },
+            },
+            { upsert: true }
+          )
+          .exec();
+
+        await interaction.reply(
+          "You have successfully released your pet back into the wild."
+        );
+      } catch (error) {
+        console.error(error);
+        await interaction.reply(
+          "An error occurred while trying to release your pet. Please try again later."
+        );
+      }
+    }
+    if (subcommand === "adopt") {
+      const userId = interaction.user.id;
+
+      try {
+        userDb = await userModel
+          .findOneAndUpdate(
+            { userId },
+            {},
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+          )
+          .exec();
+      } catch (error) {
+        console.error("Create/Fetch User Error >", error);
+        // Handle the error, e.g., by replying to the interaction with an error message
+        await interaction.reply({
+          content:
+            "An error occurred while processing your request. Please try again later.",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      // Now proceed with the rest of your code, userDb should be defined
+      if (userDb.hasPet) {
+        const alreadyHavePetEmbed = new EmbedBuilder()
+          .setTitle("You already have a pet!")
+          .setDescription("You can't adopt another one!")
+          .setColor("#ff0000");
+
+        await interaction.reply({
+          embeds: [alreadyHavePetEmbed],
+        });
+        return;
+      }
+      const startingEmbed = new EmbedBuilder()
+        .setTitle("Welcome to AdoptMe!")
+        .setDescription(
+          "AdoptMe is a Discord bot that lets you keep a virtual pet!"
+        )
+        .setColor("#9e38fe")
+        .addFields({
+          name: "Getting Started",
+          value: "Choose a pet type to adopt by selecting from the menu below.",
+        });
+
+      const selectMenu = new StringSelectMenuBuilder()
+        .setCustomId("getCreateMenu")
+        .setPlaceholder("Select a pet to adopt!")
+        .addOptions([
+          {
+            label: "Dog",
+            value: "1",
+            description: "Adopt a dog!",
+            emoji: "🐶",
+          },
+          {
+            label: "Cat",
+            value: "2",
+            description: "Adopt a cat!",
+            emoji: "🐱",
+          },
+          {
+            label: "Red Panda",
+            value: "3",
+            description: "Adopt a red panda!",
+            emoji: "🐼",
+          },
+        ]);
+
+      // Show the select menu to choose a pet type
+      await interaction.reply({
+        embeds: [startingEmbed],
+        components: [
+          new ActionRowBuilder().addComponents(selectMenu), // Changed the type to 1
+        ],
+      });
     }
   },
 };
