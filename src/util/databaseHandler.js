@@ -25,13 +25,6 @@ module.exports = class DatabaseHandler {
             this.cache.delete(user?.userId);
           }
         }
-        if (process.env.STATUS === "DEVELOPMENT") {
-          console.log(
-            `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-              ">"
-            )} ${ChalkAdvanced.green("Cache sweep completed")}`
-          );
-        }
       },
       60 * 60 * 1000
     );
@@ -42,15 +35,17 @@ module.exports = class DatabaseHandler {
    * @returns {Promise<void>}
    */
   async connectToDatabase() {
-    await connect(this.connectionString, { useNewUrlParser: true })
+    await connect(this.connectionString, {
+      useNewUrlParser: true,
+    })
       .catch((err) => {
-        console.error(`${ChalkAdvanced.red("Database Error >")} ${err}`);
+        console.log(err);
       })
       .then(() =>
         console.log(
-          `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
+          `${ChalkAdvanced.white("Database")} ${ChalkAdvanced.gray(
             ">"
-          )} ${ChalkAdvanced.green("Database: Successfully loaded database")}`
+          )} ${ChalkAdvanced.green("Successfully loaded database")}`
         )
       );
   }
@@ -63,29 +58,19 @@ module.exports = class DatabaseHandler {
    * @private
    */
   async fetchUser(userId, createIfNotFound = false) {
-    return await this.userModel
-      .findOne({ userId: userId })
-      .catch((err) => {
-        console.error(`${ChalkAdvanced.red("Fetch User Error >")} ${err}`);
-      })
-      .then((fetched) => {
-        if (fetched) return fetched;
-        if (!fetched && createIfNotFound) {
-          return this.userModel
-            .create({
-              userId: userId,
-              language: "en_EN",
-              botJoined: (Date.now() / 1000) | 0,
-            })
-            .then(() => this.userModel.findOne({ userId: userId }))
-            .catch((err) => {
-              console.error(
-                `${ChalkAdvanced.red("Create/Fetch User Error >")} ${err}`
-              );
-            });
-        }
-        return null;
+    const fetched = await this.userModel.findOne({ userId: userId });
+
+    if (fetched) return fetched;
+    if (!fetched && createIfNotFound) {
+      await this.userModel.create({
+        userId: userId,
+        language: "en_EN",
+        botJoined: (Date.now() / 1000) | 0,
       });
+
+      return this.userModel.findOne({ userId: userId });
+    }
+    return null;
   }
 
   /**
@@ -131,9 +116,7 @@ module.exports = class DatabaseHandler {
    * @returns {Promise<this.userModel|null>}
    */
   async updateUser(userId, data = {}, createIfNotFound = false) {
-    let oldData = await this.getUser(userId, createIfNotFound).catch((err) => {
-      console.error(`${ChalkAdvanced.red("Get User Error >")} ${err}`);
-    });
+    let oldData = await this.getUser(userId, createIfNotFound);
 
     if (oldData) {
       if (oldData?._doc) oldData = oldData?._doc;
@@ -142,9 +125,12 @@ module.exports = class DatabaseHandler {
 
       this.cache.set(userId, data);
 
-      return this.userModel.updateOne({ userId: userId }, data).catch((err) => {
-        console.error(`${ChalkAdvanced.red("Update User Error >")} ${err}`);
-      });
+      return this.userModel.updateOne(
+        {
+          userId: userId,
+        },
+        data
+      );
     }
     return null;
   }
@@ -154,8 +140,6 @@ module.exports = class DatabaseHandler {
    * @returns {Promise<this.userModel[]>}
    */
   async getAll() {
-    return await this.userModel.find().catch((err) => {
-      console.error(`${ChalkAdvanced.red("Get All Users Error >")} ${err}`);
-    });
+    return this.userModel.find();
   }
 };
