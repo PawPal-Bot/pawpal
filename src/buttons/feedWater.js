@@ -7,27 +7,44 @@ module.exports = {
     name: "feedWater",
     description: "Button to give your pet water",
   },
-  async execute(interaction, client, userDb) {
+  async execute(interaction, client) {
     await interaction.deferUpdate();
+
+    const userId = interaction.user.id;
+
+    // Fetch the latest user data from the database
+    const userDb = await userModel.findOne({ userId });
+    if (!userDb) {
+      console.error("User not found:", userId);
+      // Handle error, perhaps by returning early
+      return;
+    }
+
     const petName = userDb.petName ? userDb.petName : "Your pet";
     const now = new Date();
     const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 
-    const petTypeStr = ["none", "dog", "cat", "redPanda"][userDb.petType];
-    const randomPetSound =
-      speechBubbles[petTypeStr][
-        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
-      ];
+    const petTypeStrMap = {
+      1: "dog",
+      2: "cat",
+      3: "redPanda",
+    };
+
+    const petTypeStr = petTypeStrMap[userDb.petType];
+    if (!petTypeStr) {
+      console.error("Invalid pet type:", userDb.petType);
+      // Handle error, perhaps by returning early
+      return;
+    }
     const randomDrinkingSound =
       speechBubbles.drinkingSounds[
         Math.floor(Math.random() * speechBubbles.drinkingSounds.length)
       ];
-
-    const recentDrinks = (userDb.actionTimestamps.lastDrank || []).filter(
-      (drinkTime) => drinkTime >= tenMinutesAgo
-    );
-
-    if (recentDrinks.length >= 3) {
+    const randomPetSound =
+      speechBubbles[petTypeStr][
+        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
+      ];
+    if (userDb.actionTimestamps.lastDrank.length >= 3) {
       const tooMuchDrinkEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
         .setTitle("Oh no!")
@@ -48,7 +65,7 @@ module.exports = {
       userDb.thirst + Math.floor(Math.random() * 15) + 1,
       100
     );
-    await userModel.updateOne(
+    await userModel.findOneAndUpdate(
       { userId: interaction.user.id },
       {
         $set: {
@@ -74,7 +91,7 @@ module.exports = {
       .setCustomId("feedWater")
       .setLabel("Give More Water")
       .setStyle("Primary")
-      .setDisabled(userDb.drinkTimestamps.length >= 3);
+      .setDisabled(userDb.actionTimestamps.lastDrank.length >= 4);
 
     await interaction.editReply({
       embeds: [updatedWaterEmbed],
