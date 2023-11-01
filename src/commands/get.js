@@ -9,23 +9,26 @@ const userModel = require("../util/Models/userModel");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("get")
-    .setDescription("Get started with AdoptMe!")
+    .setDescription("Get started with PawPal!")
     .addSubcommand((subcommand) =>
-      subcommand.setName("started").setDescription("Get started with AdoptMe!")
+      subcommand
+        .setName("started")
+        .setDescription("Commence the initial setup for PawPal.")
     ),
 
   async execute(interaction, client, userDb) {
     const userId = interaction.user.id;
 
     try {
-      userDb = await userModel.findOne({ userId }).exec();
-      if (!userDb) {
-        userDb = await userModel.create({ userId });
-        console.log("Document not found, creating one");
-      }
+      userDb = await userModel
+        .findOneAndUpdate(
+          { userId },
+          {},
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        )
+        .exec();
     } catch (error) {
       console.error("Create/Fetch User Error >", error);
-      // Handle the error, e.g., by replying to the interaction with an error message
       await interaction.reply({
         content:
           "An error occurred while processing your request. Please try again later.",
