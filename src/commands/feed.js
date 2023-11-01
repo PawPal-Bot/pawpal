@@ -1,8 +1,8 @@
 const {
-  EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   SlashCommandBuilder,
+  EmbedBuilder,
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
@@ -15,61 +15,45 @@ module.exports = {
   async execute(interaction, client) {
     const userDb = await userModel.findOne({ userId: interaction.user.id });
 
-    if (!userDb || userDb.petType === 0) {
+    if (!userDb || !userDb.hasPet) {
       await interaction.reply("You don't have a pet to feed!");
       return;
     }
 
     const petName = userDb.petName ? userDb.petName : "Your pet";
 
-    if (userDb.feedTimestamps.length >= 3) {
-      const tooFullEmbed = new EmbedBuilder()
-        .setColor("#9e38fe")
-        .setTitle("Oh no!")
-        .setDescription(
-          `${petName} is too full to eat that right now, try again in a little bit`
-        )
-        .setTimestamp();
+    // Create buttons for feeding food and water
+    const feedFoodButton = new ButtonBuilder()
+      .setCustomId("feedFood")
+      .setLabel("Give Food")
+      .setStyle("Primary")
+      .setEmoji("🍽️");
 
-      await interaction.reply({
-        embeds: [tooFullEmbed],
-        components: [],
-      });
-      return;
-    }
+    const feedWaterButton = new ButtonBuilder()
+      .setCustomId("feedWater")
+      .setLabel("Give Water")
+      .setStyle("Primary")
+      .setEmoji("💧");
 
-    userDb.feedTimestamps.push(new Date());
-    userDb.feedTimestamps = userDb.feedTimestamps.slice(-3);
-    userDb.feedCount += 1;
-    await userDb.save();
+    // Create an ActionRow to house the buttons
+    const actionRow = new ActionRowBuilder().addComponents(
+      feedFoodButton,
+      feedWaterButton
+    );
 
-    const petTypeStr = ["none", "dog", "cat", "redPanda"][userDb.petType];
-    const randomPetSound =
-      speechBubbles[petTypeStr][
-        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
-      ];
-    const randomEatingSound =
-      speechBubbles.eatingSounds[
-        Math.floor(Math.random() * speechBubbles.eatingSounds.length)
-      ];
-
-    const feedEmbed = new EmbedBuilder()
-      .setColor("#9e38fe")
-      .setTitle(`You fed ${petName} a treat!`)
+    // Create an embed
+    const embed = new EmbedBuilder()
+      .setColor("#0099ff")
+      .setTitle(`Feed ${petName}`)
       .setDescription(
-        `${randomPetSound}! ${petName} ${randomEatingSound}s the treat happily!`
-      )
-      .setTimestamp();
+        `Hello there! It seems like ${petName} is ready for a meal or a drink. What would you like to give them? 
+        \nProviding a balanced diet of food and water will keep ${petName} happy and healthy.
+        \nChoose an option below to feed or hydrate your adorable companion! 🍲💧`
+      );
 
-    const feedAgainButton = new ButtonBuilder()
-      .setCustomId("feedAgain")
-      .setLabel("Feed Again")
-      .setStyle("Primary");
-
-    const actionRow = new ActionRowBuilder().addComponents(feedAgainButton);
-
+    // Reply with the embed and buttons
     await interaction.reply({
-      embeds: [feedEmbed],
+      embeds: [embed],
       components: [actionRow],
     });
   },

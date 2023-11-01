@@ -1,11 +1,8 @@
 const {
   SlashCommandBuilder,
   EmbedBuilder,
-  ButtonBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
-  TextInputBuilder,
-  ModalBuilder,
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 
@@ -18,8 +15,37 @@ module.exports = {
     ),
 
   async execute(interaction, client, userDb) {
-    interaction.client = interaction.client || {}; // Initialize interaction.client if it's undefined
-    interaction.client.userStates = interaction.client.userStates || {}; // Initialize userStates if it's undefined
+    const userId = interaction.user.id;
+
+    try {
+      userDb = await userModel.findOne({ userId }).exec();
+      if (!userDb) {
+        userDb = await userModel.create({ userId });
+        console.log("Document not found, creating one");
+      }
+    } catch (error) {
+      console.error("Create/Fetch User Error >", error);
+      // Handle the error, e.g., by replying to the interaction with an error message
+      await interaction.reply({
+        content:
+          "An error occurred while processing your request. Please try again later.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // Now proceed with the rest of your code, userDb should be defined
+    if (userDb.hasPet) {
+      const alreadyHavePetEmbed = new EmbedBuilder()
+        .setTitle("You already have a pet!")
+        .setDescription("You can't adopt another one!")
+        .setColor("#ff0000");
+
+      await interaction.reply({
+        embeds: [alreadyHavePetEmbed],
+      });
+      return;
+    }
     const startingEmbed = new EmbedBuilder()
       .setTitle("Welcome to AdoptMe!")
       .setDescription(
@@ -56,77 +82,11 @@ module.exports = {
       ]);
 
     // Show the select menu to choose a pet type
-    console.log("Sending Starting Embed...");
     await interaction.reply({
       embeds: [startingEmbed],
       components: [
         new ActionRowBuilder().addComponents(selectMenu), // Changed the type to 1
       ],
     });
-
-    if (!interaction.isStringSelectMenu()) return;
-
-    if (interaction.customId === "getCreateMenu") {
-      const selectedPetType = interaction.values[0];
-      console.log("Selected Pet Type:", selectedPetType);
-
-      try {
-        await userModel
-          .findOneAndUpdate(
-            { userId: interaction.user.id },
-            { petType: selectedPetType },
-            { upsert: true }
-          )
-          .exec();
-        console.log("Saved Pet Type to Database:", selectedPetType);
-      } catch (error) {
-        console.error("Error updating pet type:", error);
-        interaction.reply({
-          content:
-            "An error occurred while processing your request. Please try again later.",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      // Get the label of the selected pet type
-      let selectedPetLabel;
-      if (selectedPetType === "1") {
-        selectedPetLabel = "Dog";
-      } else if (selectedPetType === "2") {
-        selectedPetLabel = "Cat";
-      } else if (selectedPetType === "3") {
-        selectedPetLabel = "Red Panda";
-      }
-      console.log("Selected Pet Label:", selectedPetLabel);
-
-      interaction.client.userStates[interaction.user.id] = {
-        state: "awaitingPetName",
-        selectedPetLabel,
-      };
-
-      // Now, you can initiate and show the modal for naming the pet with the selected pet type's label
-      const petNameInput = new TextInputBuilder()
-        .setLabel("Pet Name")
-        .setCustomId("petNameInput")
-        .setPlaceholder(
-          `Enter your ${selectedPetLabel}'s name. Max 25 chars and no more than 2 spaces are permitted.`
-        )
-        .setStyle("Short")
-        .setRequired(true);
-
-      const petNameActionRow = new ActionRowBuilder().addComponents(
-        petNameInput
-      );
-
-      const modal = new ModalBuilder()
-        .setTitle(`Name Your ${selectedPetLabel}`)
-        .setCustomId("namePetModal")
-        .addComponents(petNameActionRow);
-
-      // Show the modal
-      console.log("Showing Modal...");
-      await interaction.showModal(modal);
-    }
   },
 };

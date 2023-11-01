@@ -30,7 +30,8 @@ module.exports = {
 
       if (!userDb || userDb.petType === 0) {
         await interaction.reply({
-          content: "You don't have a pet to name!",
+          content:
+            "You don't have a pet to name. Run </get started:1168885856032014448> to adopt one",
           ephemeral: true,
         });
         return;
@@ -63,7 +64,8 @@ module.exports = {
 
       if (!userDb || userDb.petType === 0) {
         await interaction.reply({
-          content: "You don't have a pet to name!",
+          content:
+            "You don't have a pet to look up. Run </get started:1168885856032014448>",
           ephemeral: true,
         });
         return;
@@ -71,9 +73,10 @@ module.exports = {
 
       const petName = userDb.petName || "Your pet";
 
-      const fieldsArray = [
+      // Basic Info
+      const basicInfoFields = [
         {
-          name: "🪧 Name",
+          name: "🪧 Pet Name",
           value: userDb.petName || "You haven't chosen a name",
           inline: true,
         },
@@ -82,19 +85,69 @@ module.exports = {
           value: ["❌ None", "Dog", "Cat", "Red Panda"][userDb.petType],
           inline: true,
         },
-        { name: "👶 Age", value: userDb.petAge.toString(), inline: true },
+        {
+          name: "👶 Life Stage & Age",
+          value: `${
+            ["Baby", "Child", "Teen", "Adult"][userDb.lifeStage]
+          }, aged ${userDb.age}`,
+          inline: true,
+        },
+      ];
+
+      // Health & Needs
+      const healthNeedsFields = [
+        { name: "❤️ Health", value: `${userDb.health}/100`, inline: true },
+        { name: "🍔 Hunger", value: `${userDb.hunger}/100`, inline: true },
+        { name: "💧 Thirst", value: `${userDb.thirst}/100`, inline: true },
+        {
+          name: "🏃🏾‍♂️ Energy Level",
+          value: userDb.energy.toString(),
+          inline: true,
+        },
+        {
+          name: "💕 Affection",
+          value: `${userDb.affection}/100`,
+          inline: true,
+        },
         {
           name: "❤️ Happiness",
-          value: `${userDb.petHappiness}/100`,
+          value: `${userDb.happiness}/100`,
           inline: true,
         },
-        { name: "🍔 Hungriness", value: `${userDb.petHunger}/100`, inline: true },
+        {
+          name: "😷 Is Sick?",
+          value: userDb.isSick ? "Yes" : "No",
+          inline: true,
+        },
+        {
+          name: "🎓 Education Level",
+          value: userDb.educationLevel.toString(),
+          inline: true,
+        },
         {
           name: "🛁 Cleanliness",
-          value: `${userDb.petCleanliness}/100`,
+          value: `${userDb.cleanliness}/100`,
           inline: true,
         },
-        { name: "🖐️ Times Pat", value: userDb.patCount.toString(), inline: true },
+        {
+          name: "🏃 Exercise Level",
+          value: userDb.exerciseLevel.toString(),
+          inline: true,
+        },
+        {
+          name: "💤 Sleep Level",
+          value: `${userDb.sleepLevel}/100`,
+          inline: true,
+        },
+      ];
+
+      // Interactions
+      const interactionsFields = [
+        {
+          name: "🖐️ Times Pat",
+          value: userDb.patCount.toString(),
+          inline: true,
+        },
         {
           name: "⏰ Last Pat",
           value:
@@ -116,6 +169,48 @@ module.exports = {
               : "Never",
           inline: true,
         },
+        {
+          name: "💦 Times Drank",
+          value: userDb.drinkCount.toString(),
+          inline: true,
+        },
+        {
+          name: "⏰ Last Drank",
+          value:
+            userDb.drinkTimestamps.length > 0
+              ? `<t:${Math.floor(
+                  userDb.drinkTimestamps.slice(-1)[0] / 1000
+                )}:R>`
+              : "Never",
+          inline: true,
+        },
+        {
+          name: "🛁 Times Cleaned",
+          value: userDb.cleanedCount.toString(),
+          inline: true,
+        },
+        {
+          name: "⏰ Last Cleaned",
+          value:
+            userDb.cleanedTimestamps.length > 0
+              ? `<t:${Math.floor(
+                  userDb.cleanedTimestamps.slice(-1)[0] / 1000
+                )}:R>`
+              : "Never",
+          inline: true,
+        },
+      ];
+
+      // Combine all fields into a single array
+      const fieldsArray = [
+        { name: "Basic Info", value: "\u200B", inline: false },
+        ...basicInfoFields,
+
+        { name: "Health & Needs", value: "\u200B", inline: false },
+        ...healthNeedsFields,
+
+        { name: "Interactions", value: "\u200B", inline: false },
+        ...interactionsFields,
       ];
 
       const petInfoEmbed = new EmbedBuilder()
