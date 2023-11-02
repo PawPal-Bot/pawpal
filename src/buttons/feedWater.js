@@ -70,6 +70,7 @@ module.exports = {
         $set: {
           actionTimestamps: userDb.actionTimestamps,
           thirst: userDb.thirst,
+          drinkCount: userDb.drinkCount + 1,
         },
       }
     );

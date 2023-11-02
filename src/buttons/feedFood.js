@@ -71,6 +71,7 @@ module.exports = {
         $set: {
           actionTimestamps: userDb.actionTimestamps,
           hunger: userDb.hunger,
+          feedCount: userDb.feedCount + 1,
         },
       }
     );
