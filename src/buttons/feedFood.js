@@ -42,6 +42,35 @@ module.exports = {
         Math.floor(Math.random() * speechBubbles.eatingSounds.length)
       ];
 
+    if (userDb.isSick) {
+      const randomChance = Math.random();
+      if (randomChance < 0.6) {
+        const feedFailEmbed = new EmbedBuilder()
+          .setColor("#9e38fe")
+          .setTitle("Oh no!")
+          .setDescription(
+            `${petName} isn't feeling well, they don't want to eat right now.`
+          )
+          .setTimestamp();
+
+        const feedAgainButton = new ButtonBuilder()
+          .setCustomId("feedFood")
+          .setLabel("Give More Food")
+          .setStyle("Primary")
+          .setDisabled(true);
+
+        await interaction.editReply({
+          embeds: [feedFailEmbed],
+          components: [new ActionRowBuilder().addComponents(feedAgainButton)],
+        });
+
+        userDb.actionTimestamps.lastFed.push(new Date(Date.now() + 3600000));
+        await userDb.save();
+
+        return;
+      }
+    }
+
     if (userDb.actionTimestamps.lastFed.length >= 3) {
       const tooMuchFoodEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
