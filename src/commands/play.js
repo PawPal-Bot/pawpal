@@ -57,6 +57,8 @@ module.exports = {
     if (subcommand === "pat") {
       await interaction.deferReply();
 
+      const userDb = await userModel.findOne({ userId: interaction.user.id });
+
       if (!userDb || userDb.petType === 0) {
         await interaction.editReply("You don't have a pet to pat!");
         return;
@@ -138,6 +140,7 @@ module.exports = {
         components: [new ActionRowBuilder().addComponents(patButton)],
       });
     } else if (subcommand === "cuddle") {
+      const userDb = await userModel.findOne({ userId: interaction.user.id });
       const lastCuddledArray = userDb.actionTimestamps.lastCuddled;
       const lastCuddled =
         lastCuddledArray.length > 0
@@ -159,6 +162,7 @@ module.exports = {
 
       userDb.actionTimestamps.lastCuddled = Date.now();
 
+      const happinessIncrease = 5;
       userDb.happiness = Math.min(userDb.happiness + happinessIncrease, 100);
       userDb.affection = parseFloat(
         (userDb.affection + affectionIncrease).toFixed(2)
