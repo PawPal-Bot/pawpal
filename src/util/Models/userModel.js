@@ -1,17 +1,12 @@
 const { Schema, model } = require("mongoose");
-
-const generateUniquePetId = () => {
-  const randomNum = Math.floor(Math.random() * 1000000);
-  const timestamp = Date.now();
-  return Number(`${randomNum}${timestamp}`);
-};
+const { v4: uuidv4 } = require("uuid");
 
 const userProfile = new Schema(
   {
     userId: { type: Number, required: true, unique: true },
     petId: {
-      type: Number,
-      default: generateUniquePetId(),
+      type: String,
+      default: () => uuidv4(),
       unique: true,
     },
     petName: {
