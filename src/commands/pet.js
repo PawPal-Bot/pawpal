@@ -247,10 +247,36 @@ module.exports = {
         ...interactionsFields,
       ];
 
+      const baseImageUrl = "https://fjord.au/assets/pawpal";
+      const petTypeFolder =
+        userDb.petType === 1
+          ? "dog"
+          : userDb.petType === 2
+          ? "cat"
+          : "redpanda";
+      let emotionSuffix;
+
+      if (userDb.happiness < 30) {
+        emotionSuffix = "A"; // Angry
+      } else if (userDb.happiness <= 60) {
+        emotionSuffix = "N"; // Neutral
+      } else {
+        emotionSuffix = "H"; // Happy
+      }
+
+      const imageUrl = `${baseImageUrl}/${petTypeFolder}/${petTypeFolder}${emotionSuffix}.png`;
+
       const petInfoEmbed = new EmbedBuilder()
-        .setTitle(`${petName}'s Information`)
+        .setThumbnail(imageUrl)
+        .setAuthor({
+          name: petName + "'s Information",
+          iconURL: imageUrl,
+        })
         .addFields(fieldsArray)
-        .setColor("#9e38fe");
+        .setColor("#9e38fe")
+        .setFooter({
+          text: `Pet information for ${interaction.user.username} | PawPal`,
+        });
 
       await interaction.reply({ embeds: [petInfoEmbed] });
     } else if (subcommand === "release") {
@@ -340,7 +366,6 @@ module.exports = {
           .exec();
       } catch (error) {
         console.error("Create/Fetch User Error >", error);
-        // Handle the error, e.g., by replying to the interaction with an error message
         await interaction.reply({
           content:
             "An error occurred while processing your request. Please try again later.",
@@ -396,12 +421,9 @@ module.exports = {
           },
         ]);
 
-      // Show the select menu to choose a pet type
       await interaction.reply({
         embeds: [startingEmbed],
-        components: [
-          new ActionRowBuilder().addComponents(selectMenu), // Changed the type to 1
-        ],
+        components: [new ActionRowBuilder().addComponents(selectMenu)],
       });
     }
   },
