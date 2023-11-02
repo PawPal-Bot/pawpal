@@ -32,7 +32,7 @@ module.exports = {
         .setDescription("Release your pet back into the wild")
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("adopt").setDescription("Get started with PawPal!")
+      subcommand.setName("adopt").setDescription("Adopt a new pet!")
     ),
 
   async execute(interaction) {
@@ -86,6 +86,21 @@ module.exports = {
 
       const petName = userDb.petName || "Your pet";
 
+      // function to get a description of the pet's cleanliness
+      function getCleanlinessDescription(value) {
+        if (value > 80) {
+          return "Sparkling";
+        } else if (value >= 60) {
+          return "Clean";
+        } else if (value >= 40) {
+          return "Tidy";
+        } else if (value >= 25) {
+          return "Messy";
+        } else {
+          return "Filthy";
+        }
+      }
+
       // Basic Info
       const basicInfoFields = [
         {
@@ -109,9 +124,9 @@ module.exports = {
 
       // Health & Needs
       const healthNeedsFields = [
-        { name: "❤️ Health", value: `${userDb.health}/100`, inline: true },
-        { name: "🍔 Hunger", value: `${userDb.hunger}/100`, inline: true },
-        { name: "💧 Thirst", value: `${userDb.thirst}/100`, inline: true },
+        { name: "❤️ Health", value: `${userDb.health}`, inline: true },
+        { name: "🍔 Hunger", value: `${userDb.hunger}`, inline: true },
+        { name: "💧 Thirst", value: `${userDb.thirst}`, inline: true },
         {
           name: "🏃🏾‍♂️ Energy Level",
           value: userDb.energy.toString(),
@@ -119,12 +134,12 @@ module.exports = {
         },
         {
           name: "💕 Affection",
-          value: `${userDb.affection}/100`,
+          value: `${userDb.affection.toFixed(2)}`,
           inline: true,
         },
         {
           name: "❤️ Happiness",
-          value: `${userDb.happiness}/100`,
+          value: `${userDb.happiness}`,
           inline: true,
         },
         {
@@ -139,7 +154,7 @@ module.exports = {
         },
         {
           name: "🛁 Cleanliness",
-          value: `${userDb.cleanliness}/100`,
+          value: `${getCleanlinessDescription(userDb.cleanliness)}`,
           inline: true,
         },
         {
