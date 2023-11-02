@@ -1,6 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
+const timeStamps = require("../util/timeStamp");
 
 module.exports = {
   data: {
@@ -41,7 +42,32 @@ module.exports = {
       speechBubbles[petTypeStr][
         Math.floor(Math.random() * speechBubbles[petTypeStr].length)
       ];
-    if (userDb.actionTimestamps.lastDrank.length >= 3) {
+
+    const oldestDrankTime = new Date(
+      userDb.actionTimestamps.lastDrank[0]
+    ).getTime();
+    const timeSinceOldestDrank = now - oldestDrankTime;
+    const canDrink =
+      timeSinceOldestDrank >= timeStamps.tenMinutes() ||
+      userDb.actionTimestamps.lastDrank.length < 3;
+
+    if (userDb.thirst >= 100) {
+      const tooMuchDrinkEmbed = new EmbedBuilder()
+        .setColor("#9e38fe")
+        .setTitle("Oh no!")
+        .setDescription(
+          `${randomPetSound}! ${petName} has had enough to drink recently. Try again later.`
+        )
+        .setTimestamp();
+
+      await interaction.editReply({
+        embeds: [tooMuchDrinkEmbed],
+        components: [],
+      });
+      return;
+    }
+
+    if (!canDrink) {
       const tooMuchDrinkEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
         .setTitle("Oh no!")
@@ -58,17 +84,22 @@ module.exports = {
     }
 
     userDb.actionTimestamps.lastDrank.push(now);
-    userDb.thirst = Math.min(
-      userDb.thirst + Math.floor(Math.random() * 15) + 1,
-      100
-    );
+    if (userDb.actionTimestamps.lastDrank.length > 5) {
+      userDb.actionTimestamps.lastDrank.shift();
+    }
+
+    const increaseThirstBy = Math.floor(Math.random() * 15) + 1;
+    userDb.thirst = Math.min(userDb.thirst + increaseThirstBy, 100);
+
+    userDb.drinkCount += 1;
+
     await userModel.findOneAndUpdate(
       { userId: interaction.user.id },
       {
         $set: {
           actionTimestamps: userDb.actionTimestamps,
           thirst: userDb.thirst,
-          drinkCount: userDb.drinkCount + 1,
+          drinkCount: userDb.drinkCount,
         },
       }
     );
@@ -79,7 +110,6 @@ module.exports = {
       .setDescription(
         `${randomPetSound}! ${petName} ${randomDrinkingSound}s the water happily! Their thirst level is now ${userDb.thirst}.`
       )
-
       .setFooter({
         text: `Thirst Level: ${userDb.thirst}/100`,
       })
@@ -89,7 +119,7 @@ module.exports = {
       .setCustomId("feedWater")
       .setLabel("Give More Water")
       .setStyle("Primary")
-      .setDisabled(userDb.actionTimestamps.lastDrank.length >= 4);
+      .setDisabled(!canDrink);
 
     await interaction.editReply({
       embeds: [updatedWaterEmbed],

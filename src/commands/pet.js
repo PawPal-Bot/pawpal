@@ -5,6 +5,7 @@ const {
   StringSelectMenuBuilder,
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
+const variables = require("../data/variableNames");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -86,22 +87,8 @@ module.exports = {
 
       const petName = userDb.petName || "Your pet";
 
-      // function to get a description of the pet's cleanliness
-      function getCleanlinessDescription(value) {
-        if (value > 80) {
-          return "Sparkling";
-        } else if (value >= 60) {
-          return "Clean";
-        } else if (value >= 40) {
-          return "Tidy";
-        } else if (value >= 25) {
-          return "Messy";
-        } else {
-          return "Filthy";
-        }
-      }
-
       // Basic Info
+
       const basicInfoFields = [
         {
           name: "🪧 Pet Name",
@@ -124,22 +111,34 @@ module.exports = {
 
       // Health & Needs
       const healthNeedsFields = [
-        { name: "❤️ Health", value: `${userDb.health}`, inline: true },
-        { name: "🍔 Hunger", value: `${userDb.hunger}`, inline: true },
-        { name: "💧 Thirst", value: `${userDb.thirst}`, inline: true },
+        {
+          name: "❤️ Health",
+          value: `${variables.getHealth(userDb.health)}`,
+          inline: true,
+        },
+        {
+          name: "🍔 Hunger",
+          value: `${variables.getHunger(userDb.hunger)}`,
+          inline: true,
+        },
+        {
+          name: "💧 Thirst",
+          value: `${variables.getThirst(userDb.thirst)}`,
+          inline: true,
+        },
         {
           name: "🏃🏾‍♂️ Energy Level",
-          value: userDb.energy.toString(),
+          value: `${variables.getEnergy(userDb.energy)}`,
           inline: true,
         },
         {
           name: "💕 Affection",
-          value: `${userDb.affection.toFixed(2)}`,
+          value: `${variables.getAffection(userDb.affection)}`,
           inline: true,
         },
         {
           name: "❤️ Happiness",
-          value: `${userDb.happiness}`,
+          value: `${variables.getHappiness(userDb.happiness)}`,
           inline: true,
         },
         {
@@ -149,22 +148,22 @@ module.exports = {
         },
         {
           name: "🎓 Education Level",
-          value: userDb.educationLevel.toString(),
+          value: `${variables.getEducation(userDb.educationLevel)}`,
           inline: true,
         },
         {
           name: "🛁 Cleanliness",
-          value: `${getCleanlinessDescription(userDb.cleanliness)}`,
+          value: `${variables.getCleanliness(userDb.cleanliness)}`,
           inline: true,
         },
         {
           name: "🏃 Exercise Level",
-          value: userDb.exerciseLevel.toString(),
+          value: `${variables.getExercise(userDb.exerciseLevel)}`,
           inline: true,
         },
         {
           name: "💤 Sleep Level",
-          value: `${userDb.sleepLevel}/100`,
+          value: `${variables.getSleep(userDb.sleepLevel)}`,
           inline: true,
         },
       ];

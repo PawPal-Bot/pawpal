@@ -5,7 +5,6 @@ const {
   EmbedBuilder,
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
-const speechBubbles = require("../data/speechbubbles.json");
 const timeStamp = require("../util/timeStamp");
 
 module.exports = {
@@ -27,36 +26,41 @@ module.exports = {
     const lastFedTimes = userDb.actionTimestamps.lastFed;
     const lastDrankTimes = userDb.actionTimestamps.lastDrank;
 
-    // Determine the time since the last actions
-    const timeSinceLastFed =
-      lastFedTimes.length > 0
-        ? Date.now() - new Date(lastFedTimes.slice(-1)[0]).getTime()
-        : Infinity;
-    const timeSinceLastDrank =
-      lastDrankTimes.length > 0
-        ? Date.now() - new Date(lastDrankTimes.slice(-1)[0]).getTime()
-        : Infinity;
+    const oldestFedTime =
+      lastFedTimes.length > 0 ? new Date(lastFedTimes[0]).getTime() : 0;
+    const oldestDrankTime =
+      lastDrankTimes.length > 0 ? new Date(lastDrankTimes[0]).getTime() : 0;
 
-    // Determine the message to show based on the time since the last actions
+    const timeUntilNextAllowedFeed = Math.max(
+      0,
+      Math.ceil((oldestFedTime + timeStamp.tenMinutes() - Date.now()) / 60000)
+    );
+    const timeUntilNextAllowedDrink = Math.max(
+      0,
+      Math.ceil((oldestDrankTime + timeStamp.tenMinutes() - Date.now()) / 60000)
+    );
+
+    const canFeedFood =
+      userDb.hunger <= 100 &&
+      (timeUntilNextAllowedFeed <= 0 || lastFedTimes.length < 3);
+    const canFeedWater =
+      userDb.thirst <= 100 &&
+      (timeUntilNextAllowedDrink <= 0 || lastDrankTimes.length < 3);
+
     let description = `Hello there! It seems like ${petName} is ready for a meal or a drink. What would you like to give them? 
     \nProviding a balanced diet of food and water will keep ${petName} happy and healthy.
     \nChoose an option below to feed or hydrate your adorable companion! 🍲💧`;
 
-    if (timeSinceLastFed < timeStamp.tenMinutes() && lastFedTimes.length >= 3) {
-      const timeRemaining = Math.ceil(
-        (timeStamp.tenMinutes() - timeSinceLastFed) / 60000
-      );
-      if (userDb.thirst < 20) {
-        description = `${petName} is still trying to digest from the last feed and isn't thirsty either. Try again in ${timeRemaining} minutes.`;
-      } else {
-        description = `${petName} is still trying to digest from the last feed. Try again in ${timeRemaining} minutes. They might want some water though! 💧`;
-      }
-    } else if (userDb.hunger < 20 && userDb.thirst >= 20) {
-      description = `${petName} isn't ready to eat, but they are thirsty.`;
-    } else if (userDb.thirst < 20 && userDb.hunger >= 20) {
-      description = `${petName} isn't thirsty, but they are ready to eat.`;
-    } else if (userDb.hunger < 20 && userDb.thirst < 20) {
-      description = `${petName} isn't hungry or thirsty right now.`;
+    if (canFeedFood && canFeedWater) {
+      description = `Hello there! It seems like ${petName} is ready for a meal or a drink. What would you like to give them? 
+        \nProviding a balanced diet of food and water will keep ${petName} happy and healthy.
+        \nChoose an option below to feed or hydrate your adorable companion! 🍲💧`;
+    } else if (canFeedFood && !canFeedWater) {
+      description = `${petName} is ready to eat, but they are not thirsty. They can drink again in ${timeUntilNextAllowedDrink} minutes.`;
+    } else if (!canFeedFood && canFeedWater) {
+      description = `${petName} is thirsty, but they are not ready to eat. They can eat again in ${timeUntilNextAllowedFeed} minutes.`;
+    } else if (!canFeedFood && !canFeedWater) {
+      description = `${petName} isn't hungry or thirsty right now. They can eat again in ${timeUntilNextAllowedFeed} minutes, and drink again in ${timeUntilNextAllowedDrink} minutes.`;
     }
 
     // Check if pet is sick and if feeding fails
@@ -83,22 +87,14 @@ module.exports = {
       .setLabel("Give Food")
       .setStyle("Primary")
       .setEmoji("🍽️")
-      .setDisabled(
-        userDb.hunger < 20 ||
-          (timeSinceLastFed < timeStamp.tenMinutes() &&
-            lastFedTimes.length >= 3)
-      ); // disable the button based on these conditions
+      .setDisabled(!canFeedFood);
 
     const feedWaterButton = new ButtonBuilder()
       .setCustomId("feedWater")
       .setLabel("Give Water")
       .setStyle("Primary")
       .setEmoji("💧")
-      .setDisabled(
-        userDb.thirst < 20 ||
-          (timeSinceLastDrank < timeStamp.tenMinutes() &&
-            lastDrankTimes.length >= 3)
-      );
+      .setDisabled(!canFeedWater);
 
     const actionRow = new ActionRowBuilder().addComponents(
       feedFoodButton,

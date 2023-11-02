@@ -1,11 +1,12 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
+const timeStamps = require("../util/timeStamp");
 
 module.exports = {
   data: {
     name: "feedFood",
-    description: "Button to feed your pet food",
+    description: "Give your adorable pet a delicious treat!",
   },
   async execute(interaction, client) {
     await interaction.deferUpdate();
@@ -47,15 +48,15 @@ module.exports = {
       if (randomChance < 0.6) {
         const feedFailEmbed = new EmbedBuilder()
           .setColor("#9e38fe")
-          .setTitle("Oh no!")
+          .setTitle("Uh-oh!")
           .setDescription(
-            `${petName} isn't feeling well, they don't want to eat right now.`
+            `${petName} isn't feeling well right now and doesn't want to eat. Let's try again later.`
           )
           .setTimestamp();
 
         const feedAgainButton = new ButtonBuilder()
           .setCustomId("feedFood")
-          .setLabel("Give More Food")
+          .setLabel("Feed Again")
           .setStyle("Primary")
           .setDisabled(true);
 
@@ -71,12 +72,22 @@ module.exports = {
       }
     }
 
-    if (userDb.actionTimestamps.lastFed.length >= 3) {
+    // Check if the pet can be fed
+    const oldestFedTime = new Date(
+      userDb.actionTimestamps.lastFed[0]
+    ).getTime();
+    const timeSinceOldestFed = now - oldestFedTime;
+    const canFeed =
+      timeSinceOldestFed >= timeStamps.tenMinutes() ||
+      userDb.actionTimestamps.lastFed.length < 3;
+
+    // Check if hunger is less than 100
+    if (userDb.hunger >= 100) {
       const tooMuchFoodEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
-        .setTitle("Oh no!")
+        .setTitle("Oops!")
         .setDescription(
-          `${randomPetSound}! ${petName} has had enough to eat recently. Try again later.`
+          `${petName} has eaten quite a bit recently and isn't hungry right now. Let's try again later.`
         )
         .setTimestamp();
 
@@ -88,26 +99,31 @@ module.exports = {
     }
 
     userDb.actionTimestamps.lastFed.push(now);
+    if (userDb.actionTimestamps.lastFed.length > 3) {
+      userDb.actionTimestamps.lastFed.shift();
+    }
     userDb.hunger = Math.min(
       userDb.hunger + Math.floor(Math.random() * 15) + 1,
       100
     );
+    userDb.feedCount += 1;
+
     await userModel.updateOne(
       { userId: interaction.user.id },
       {
         $set: {
           actionTimestamps: userDb.actionTimestamps,
           hunger: userDb.hunger,
-          feedCount: userDb.feedCount + 1,
+          feedCount: userDb.feedCount,
         },
       }
     );
 
     const updatedFeedEmbed = new EmbedBuilder()
       .setColor("#9e38fe")
-      .setTitle(`You fed ${petName} a treat again!`)
+      .setTitle(`You treated ${petName} to a delicious snack!`)
       .setDescription(
-        `${randomPetSound}! ${petName} ${randomEatingSound}s the treat happily! Their hunger level is now ${userDb.hunger}.`
+        `${randomPetSound}! ${petName} eagerly devours the tasty treat, and their hunger level is now ${userDb.hunger}.`
       )
       .setFooter({
         text: `Hunger Level: ${userDb.hunger}/100`,
@@ -116,9 +132,9 @@ module.exports = {
 
     const feedAgainButton = new ButtonBuilder()
       .setCustomId("feedFood")
-      .setLabel("Give More Food")
+      .setLabel("Feed Again")
       .setStyle("Primary")
-      .setDisabled(userDb.actionTimestamps.lastFed.length >= 4);
+      .setDisabled(!canFeed);
 
     await interaction.editReply({
       embeds: [updatedFeedEmbed],
