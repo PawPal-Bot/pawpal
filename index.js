@@ -1,5 +1,6 @@
 const AdoptMe = require("./src/util/client");
 const ChalkAdvanced = require("chalk-advanced");
+const startIntervals = require("./src/intervals/startIntervals");
 
 const client = new AdoptMe();
 
@@ -9,4 +10,5 @@ client.loginBot().then(() => {
       ">"
     )} ${ChalkAdvanced.green("Bot successfully started. ")}`
   );
+  startIntervals();
 });
