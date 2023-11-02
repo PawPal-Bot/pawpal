@@ -1,6 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
+const timeStamp = require("../util/timeStamp");
 
 module.exports = {
   data: {
