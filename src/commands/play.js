@@ -9,14 +9,13 @@ const speechBubbles = require("../data/speechbubbles.json");
 const timeStamp = require("../util/timeStamp");
 
 function getRemainingTime(lastActionTime) {
-  const remainingTimeMs = lastActionTime + timeStamp.oneHour - Date.now();
-  const remainingMinutes = Math.floor(remainingTimeMs / timeStamp.oneMinute);
+  const remainingTimeMs = lastActionTime + 3600000 - Date.now();
+  const remainingMinutes = Math.floor(remainingTimeMs / 60000);
   return remainingMinutes > 0
     ? `${remainingMinutes} minute(s)`
     : "less than a minute";
 }
 
-const baseHappinessIncrease = 5;
 const happinessIncrease = Math.floor(Math.random() * 25) + 1;
 
 module.exports = {
@@ -149,9 +148,11 @@ module.exports = {
         lastCuddled &&
         lastCuddled.getTime() >= timeStamp.thirtyMinutesAgo()
       ) {
+        const timeRemainingMs =
+          lastCuddled.getTime() + timeStamp.thirtyMinutes() - Date.now();
+        const remainingMinutes = Math.ceil(timeRemainingMs / (60 * 1000)); // Convert milliseconds to minutes and round up
         await interaction.reply({
-          content: `You have already cuddled ${petName} within the last 30 minutes. Please wait a bit before cuddling again.`,
-          ephemeral: true,
+          content: `You've already cuddled ${petName} within the last 30 minutes. Please wait ${remainingMinutes} minute(s) before cuddling again.`,
         });
         return;
       }
@@ -178,11 +179,32 @@ module.exports = {
 
       await interaction.reply({ embeds: [cuddleEmbed] });
     } else if (subcommand === "run") {
-      const lastRan = userDb.actionTimestamps.lastRan;
+      const lastWalkedArray = userDb.actionTimestamps.lastWalked;
+      const lastWalked =
+        lastWalkedArray.length > 0
+          ? new Date(lastWalkedArray[lastWalkedArray.length - 1])
+          : null;
 
-      if (lastRan && lastRan > timeStamp.oneHourAgo) {
-        const timeRemaining = getRemainingTime(lastRan);
-        const description = `${petName} is tired, you can take him for another run in ${timeRemaining}.`;
+      const lastRanArray = userDb.actionTimestamps.lastRan;
+      const lastRan =
+        lastRanArray.length > 0
+          ? new Date(lastRanArray[lastRanArray.length - 1])
+          : null;
+
+      const oneHourAgo = Date.now() - timeStamp.oneHour();
+
+      if (
+        (lastWalked && lastWalked.getTime() > oneHourAgo) ||
+        (lastRan && lastRan.getTime() > oneHourAgo)
+      ) {
+        const timeRemaining = Math.max(
+          lastWalked
+            ? lastWalked.getTime() + timeStamp.oneHour() - Date.now()
+            : 0,
+          lastRan ? lastRan.getTime() + timeStamp.oneHour() - Date.now() : 0
+        );
+        const remainingMinutes = Math.floor(timeRemaining / (60 * 1000));
+        const description = `${petName} is tired from your walk, you can take him for a run in ${remainingMinutes} minute(s).`;
         return await interaction.reply(description);
       }
       const energyDecreasePercentage = Math.random() * 10 + 10;
@@ -225,11 +247,32 @@ module.exports = {
 
       await interaction.reply({ embeds: [runEmbed] });
     } else if (subcommand === "walk") {
-      const lastWalked = userDb.actionTimestamps.lastWalked;
+      const lastWalkedArray = userDb.actionTimestamps.lastWalked;
+      const lastWalked =
+        lastWalkedArray.length > 0
+          ? new Date(lastWalkedArray[lastWalkedArray.length - 1])
+          : null;
 
-      if (lastWalked && lastWalked > timeStamp.oneHourAgo) {
-        const timeRemaining = getRemainingTime(lastWalked);
-        const description = `${petName} is tired, you can take him for another walk in ${timeRemaining}.`;
+      const lastRanArray = userDb.actionTimestamps.lastRan;
+      const lastRan =
+        lastRanArray.length > 0
+          ? new Date(lastRanArray[lastRanArray.length - 1])
+          : null;
+
+      const oneHourAgo = Date.now() - timeStamp.oneHour();
+
+      if (
+        (lastWalked && lastWalked.getTime() > oneHourAgo) ||
+        (lastRan && lastRan.getTime() > oneHourAgo)
+      ) {
+        const timeRemaining = Math.max(
+          lastWalked
+            ? lastWalked.getTime() + timeStamp.oneHour() - Date.now()
+            : 0,
+          lastRan ? lastRan.getTime() + timeStamp.oneHour() - Date.now() : 0
+        );
+        const remainingMinutes = Math.floor(timeRemaining / (60 * 1000)); // Convert milliseconds to minutes
+        const description = `${petName} is tired from your run, you can take him for a walk in ${remainingMinutes} minute(s).`;
         return await interaction.reply(description);
       }
 
@@ -255,7 +298,6 @@ module.exports = {
       userDb.actionTimestamps.lastWalked = Date.now();
       await userDb.save();
 
-      const petName = userDb.petName || "Your pet";
       let description = `${petName} enjoyed a pleasant walk with you. They are now a bit tired, but their affection for you has increased.`;
 
       if (userDb.petType === 2) {
