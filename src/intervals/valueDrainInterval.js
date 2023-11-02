@@ -50,6 +50,10 @@ module.exports = async function valueDrainInterval() {
         happinessDrainRate = 6;
         affectionDrainRate = 6;
         energyDrainRate = 6;
+        healthDrainRate = 6;
+        hungerDrainRate = 6;
+        thirstDrainRate = 6;
+        cleanlinessDrainRate = 6;
       }
 
       return {
