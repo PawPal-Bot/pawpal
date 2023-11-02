@@ -66,7 +66,7 @@ module.exports = {
       ];
 
     const recentPats = (userDb.actionTimestamps.lastPat || []).filter(
-      (patTime) => patTime >= timeStamp.tenMinutesAgo
+      (patTime) => new Date(patTime) >= timeStamp.tenMinutesAgo()
     );
 
     if (userDb.energy < 5) {
