@@ -204,12 +204,30 @@ module.exports = {
           lastRan ? lastRan.getTime() + timeStamp.oneHour() - Date.now() : 0
         );
         const remainingMinutes = Math.floor(timeRemaining / (60 * 1000));
-        const description = `${petName} is tired from your walk, you can take him for a run in ${remainingMinutes} minute(s).`;
+
+        const lastActivity = !lastWalked
+          ? "run"
+          : !lastRan
+          ? "walk"
+          : lastWalked.getTime() > lastRan.getTime()
+          ? "walk"
+          : "run";
+
+        const description = `${petName} is tired from your ${lastActivity}, you can take him for a run in ${remainingMinutes} minute(s).`;
         return await interaction.reply(description);
       }
-      const energyDecreasePercentage = Math.random() * 10 + 10;
+
+      userDb.exerciseLevel = Math.min(
+        userDb.exerciseLevel + Math.floor(Math.random() * 4) + 1,
+        250
+      );
+
+      const baseEnergyDecreasePercentage = Math.random() * 10 + 10;
+      const adjustedEnergyDecreasePercentage =
+        baseEnergyDecreasePercentage * (1 - userDb.exerciseLevel / 250);
       userDb.energy = Math.max(
-        userDb.energy - userDb.energy * (energyDecreasePercentage / 100),
+        userDb.energy -
+          userDb.energy * (adjustedEnergyDecreasePercentage / 100),
         0
       );
 
@@ -221,10 +239,13 @@ module.exports = {
           ? Math.max(userDb.affection - 1, 0)
           : Math.min(userDb.affection + 1, 100);
 
-      userDb.happiness =
-        userDb.petType === 2
-          ? Math.max(userDb.happiness - 2, 0)
-          : Math.min(userDb.happiness + 2, 100);
+      const baseHappinessIncrease = userDb.petType === 2 ? -2 : 2;
+      const adjustedHappinessIncrease =
+        baseHappinessIncrease * (1 + userDb.exerciseLevel / 250);
+      userDb.happiness = Math.min(
+        userDb.happiness + adjustedHappinessIncrease,
+        100
+      );
 
       userDb.actionTimestamps.lastRan = Date.now();
       await userDb.save();
@@ -271,14 +292,31 @@ module.exports = {
             : 0,
           lastRan ? lastRan.getTime() + timeStamp.oneHour() - Date.now() : 0
         );
-        const remainingMinutes = Math.floor(timeRemaining / (60 * 1000)); // Convert milliseconds to minutes
-        const description = `${petName} is tired from your run, you can take him for a walk in ${remainingMinutes} minute(s).`;
+        const remainingMinutes = Math.floor(timeRemaining / (60 * 1000));
+
+        const lastActivity = !lastWalked
+          ? "run"
+          : !lastRan
+          ? "walk"
+          : lastWalked.getTime() > lastRan.getTime()
+          ? "walk"
+          : "run";
+
+        const description = `${petName} is tired from your ${lastActivity}, you can take him for a walk in ${remainingMinutes} minute(s).`;
         return await interaction.reply(description);
       }
 
-      const energyDecreasePercentage = Math.random() * 7 + 5;
+      userDb.exerciseLevel = Math.min(
+        userDb.exerciseLevel + Math.floor(Math.random() * 4) + 1,
+        250
+      );
+
+      const baseEnergyDecreasePercentage = Math.random() * 7 + 5;
+      const adjustedEnergyDecreasePercentage =
+        baseEnergyDecreasePercentage * (1 - userDb.exerciseLevel / 250);
       userDb.energy = Math.max(
-        userDb.energy - userDb.energy * (energyDecreasePercentage / 100),
+        userDb.energy -
+          userDb.energy * (adjustedEnergyDecreasePercentage / 100),
         0
       );
 
@@ -290,10 +328,13 @@ module.exports = {
       userDb.energy = parseFloat(userDb.energy.toFixed(2));
       userDb.affection = parseFloat(userDb.affection.toFixed(2));
 
-      userDb.happiness =
-        userDb.petType === 2
-          ? Math.max(userDb.happiness - 2, 0)
-          : Math.min(userDb.happiness + 2, 100);
+      const baseHappinessIncrease = userDb.petType === 2 ? -2 : 2;
+      const adjustedHappinessIncrease =
+        baseHappinessIncrease * (1 + userDb.exerciseLevel / 250);
+      userDb.happiness = Math.min(
+        userDb.happiness + adjustedHappinessIncrease,
+        100
+      );
 
       userDb.actionTimestamps.lastWalked = Date.now();
       await userDb.save();
@@ -318,5 +359,3 @@ module.exports = {
     }
   },
 };
-
-/* to fix walk and run, to ensure it can only be used once per hour */
