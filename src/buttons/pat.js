@@ -64,11 +64,8 @@ module.exports = {
         Math.floor(Math.random() * speechBubbles[petTypeStr].length)
       ];
 
-    const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
-
     const recentPats = (userDb.actionTimestamps.lastPat || []).filter(
-      (patTime) => patTime >= tenMinutesAgo
+      (patTime) => patTime >= timeStamp.tenMinutesAgo
     );
 
     if (userDb.energy < 5) {

@@ -22,7 +22,6 @@ module.exports = {
 
     const petName = userDb.petName ? userDb.petName : "Your pet";
     const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 
     const petTypeStrMap = {
       1: "dog",

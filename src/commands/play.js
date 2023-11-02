@@ -6,18 +6,16 @@ const {
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
+const timeStamp = require("../util/timeStamp");
 
 function getRemainingTime(lastActionTime) {
-  const oneHour = 3600000;
-  const remainingTimeMs = lastActionTime + oneHour - Date.now();
-  const remainingMinutes = Math.floor(remainingTimeMs / 60000);
+  const remainingTimeMs = lastActionTime + timeStamp.oneHour - Date.now();
+  const remainingMinutes = Math.floor(remainingTimeMs / timeStamp.oneMinute);
   return remainingMinutes > 0
     ? `${remainingMinutes} minute(s)`
     : "less than a minute";
 }
 
-const now = new Date();
-const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 const baseHappinessIncrease = 5;
 const happinessIncrease = Math.floor(Math.random() * 25) + 1;
 
@@ -46,9 +44,9 @@ module.exports = {
 
     const affectionIncrease = Math.random() * 0.5 + 0.2; // Random float between 0.2 and 0.7
     userDb.affection = Math.min(userDb.affection + affectionIncrease, 100);
-
     const energyDecrease = Math.floor(Math.random() * 7) + 1; // Random integer between 1 and 7
     userDb.energy = Math.max(userDb.energy - energyDecrease, 0);
+    const petName = userDb.petName || "Your pet";
 
     userDb.happiness =
       userDb.petType === 2
@@ -91,7 +89,7 @@ module.exports = {
       await userDb.save();
 
       const recentPats = (userDb.actionTimestamps.lastPat || []).filter(
-        (patTime) => patTime >= tenMinutesAgo
+        (patTime) => patTime >= timeStamp.tenMinutesAgo
       );
 
       if (userDb.energy < 5) {
@@ -141,27 +139,16 @@ module.exports = {
         components: [new ActionRowBuilder().addComponents(patButton)],
       });
     } else if (subcommand === "cuddle") {
-      const userDb = await userModel.findOne({ userId: interaction.user.id });
-
-      if (!userDb || userDb.petType === 0) {
-        await interaction.reply({
-          content:
-            "You don't have a pet to cuddle. Run </get started:1168885856032014448> to adopt one",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const now = new Date();
-      const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-
       const lastCuddledArray = userDb.actionTimestamps.lastCuddled;
       const lastCuddled =
         lastCuddledArray.length > 0
           ? lastCuddledArray[lastCuddledArray.length - 1]
           : null;
 
-      if (lastCuddled && lastCuddled.getTime() >= thirtyMinutesAgo.getTime()) {
+      if (
+        lastCuddled &&
+        lastCuddled.getTime() >= timeStamp.thirtyMinutesAgo()
+      ) {
         await interaction.reply({
           content: `You have already cuddled ${petName} within the last 30 minutes. Please wait a bit before cuddling again.`,
           ephemeral: true,
@@ -169,7 +156,7 @@ module.exports = {
         return;
       }
 
-      userDb.actionTimestamps.lastCuddled = now;
+      userDb.actionTimestamps.lastCuddled = Date.now();
 
       userDb.happiness = Math.min(userDb.happiness + happinessIncrease, 100);
       userDb.affection = parseFloat(
@@ -192,9 +179,8 @@ module.exports = {
       await interaction.reply({ embeds: [cuddleEmbed] });
     } else if (subcommand === "run") {
       const lastRan = userDb.actionTimestamps.lastRan;
-      const oneHourAgo = Date.now() - 3600000; // Current time minus one hour in milliseconds
 
-      if (lastRan && lastRan > oneHourAgo) {
+      if (lastRan && lastRan > timeStamp.oneHourAgo) {
         const timeRemaining = getRemainingTime(lastRan);
         const description = `${petName} is tired, you can take him for another run in ${timeRemaining}.`;
         return await interaction.reply(description);
@@ -221,7 +207,6 @@ module.exports = {
       userDb.actionTimestamps.lastRan = Date.now();
       await userDb.save();
 
-      const petName = userDb.petName || "Your pet";
       let description = `${petName} had a great run! They are now a bit tired, but they enjoyed spending time with you.`;
 
       if (userDb.petType === 2) {
@@ -241,9 +226,8 @@ module.exports = {
       await interaction.reply({ embeds: [runEmbed] });
     } else if (subcommand === "walk") {
       const lastWalked = userDb.actionTimestamps.lastWalked;
-      const oneHourAgo = Date.now() - 3600000;
 
-      if (lastWalked && lastWalked > oneHourAgo) {
+      if (lastWalked && lastWalked > timeStamp.oneHourAgo) {
         const timeRemaining = getRemainingTime(lastWalked);
         const description = `${petName} is tired, you can take him for another walk in ${timeRemaining}.`;
         return await interaction.reply(description);
