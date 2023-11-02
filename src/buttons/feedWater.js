@@ -16,7 +16,6 @@ module.exports = {
     const userDb = await userModel.findOne({ userId });
     if (!userDb) {
       console.error("User not found:", userId);
-      // Handle error, perhaps by returning early
       return;
     }
 
@@ -32,7 +31,6 @@ module.exports = {
     const petTypeStr = petTypeStrMap[userDb.petType];
     if (!petTypeStr) {
       console.error("Invalid pet type:", userDb.petType);
-      // Handle error, perhaps by returning early
       return;
     }
     const randomDrinkingSound =
