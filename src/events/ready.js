@@ -2,6 +2,8 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { readdirSync } = require("fs");
 const { ChalkAdvanced } = require("chalk-advanced");
+const userDB = require("../util/Models/userModel");
+const { ActivityTypes } = require("discord.js");
 
 module.exports = async (client) => {
   const commandFiles = readdirSync("./src/commands/").filter((file) =>
@@ -60,8 +62,21 @@ module.exports = async (client) => {
 
   await registerCommands();
 
+  const totalUsers = await userDB.countDocuments();
+  const totalPets = await userDB.countDocuments({ hasPet: true });
+
+  const setStatus = () => {
+    if (!client.user) return;
   client.user.setPresence({
-    activities: [{ name: `${process.env.STATUSBOT}` }],
-    status: `${process.env.DISCORDSTATUS}`,
+    activities: [
+      { name: `${totalUsers} users keep ${totalPets} pets`, type: 3 },
+      { name: `Enjoying a lovely day in the park with ${totalPets} furry friends`, type: 4, emoji: '🐶'},
+    ],
+    status: 'online',
   });
+  };
+
+  setTimeout(() => setStatus(), 35 * 10);
+  setInterval(() => setStatus(), 60 * 60 * 1000);
+
 };
