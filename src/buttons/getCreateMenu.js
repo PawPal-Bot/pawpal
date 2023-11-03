@@ -69,7 +69,7 @@ module.exports = {
 
     await interaction.showModal(modal);
 
-    client.once(Events.InteractionCreate, async (modalInteraction) => {
+    client.on(Events.InteractionCreate, async (modalInteraction) => {
       if (
         !modalInteraction.isModalSubmit() ||
         modalInteraction.customId !== "namePetModal" ||
@@ -78,7 +78,6 @@ module.exports = {
         return;
       }
 
-      // Get the pet name from the modal submission
       const petName = modalInteraction.fields.getTextInputValue("petNameInput");
 
       if (!petName || petName.length > 25 || petName.split(" ").length > 3) {
@@ -90,12 +89,10 @@ module.exports = {
       }
 
       try {
-        // Check if a document with the specified userId already exists
         const existingUser = await userModel
           .findOne({ userId: modalInteraction.user.id })
           .exec();
 
-        // Update or create the document
         await userModel
           .findOneAndUpdate(
             { userId: modalInteraction.user.id },
@@ -122,7 +119,6 @@ module.exports = {
             `Oh great, your little ${selectedPetLabel} is ${petName}. That's gorgeous!\n**How to Care for Your Pet:**\n${careInstructions}`
           );
 
-        // Update the original interaction
         await modalInteraction.update({
           embeds: [updatedEmbed],
           components: [],
