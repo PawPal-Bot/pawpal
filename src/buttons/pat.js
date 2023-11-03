@@ -39,13 +39,35 @@ module.exports = {
     }
 
     if (
-      !userDb.actionTimestamps.lastPat ||
-      !Array.isArray(userDb.actionTimestamps.lastPat)
+      !userDb.actionTimeStamp.lastPat ||
+      !Array.isArray(userDb.actionTimeStamp.lastPat)
     ) {
-      userDb.actionTimestamps.lastPat = [];
+      userDb.actionTimeStamp.lastPat = [];
     }
-    userDb.actionTimestamps.lastPat.push(new Date());
-    userDb.actionTimestamps.lastPat = userDb.actionTimestamps.lastPat.slice(-5);
+
+    const now = new Date();
+    userDb.actionTimeStamp.lastPat = userDb.actionTimeStamp.lastPat.filter(
+      (patTime) => new Date(patTime) >= timeStamp.tenMinutesAgo()
+    );
+
+    if (userDb.actionTimeStamp.lastPat.length >= 3) {
+      const tooManyPatsEmbed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setTitle("Too Many Pats")
+        .setDescription(
+          `${petName} has been patted too much recently. Try again later.`
+        )
+        .setTimestamp();
+
+      await interaction.editReply({
+        embeds: [tooManyPatsEmbed],
+        components: [],
+      });
+      return;
+    }
+
+    userDb.actionTimeStamp.lastPat.push(now);
+    userDb.actionTimeStamp.lastPat = userDb.actionTimeStamp.lastPat.slice(-5);
 
     userDb.patCount += 1;
 
@@ -59,18 +81,6 @@ module.exports = {
 
     const energyDecrease = Math.floor(Math.random() * 7) + 1;
     userDb.energy = Math.max(userDb.energy - energyDecrease, 0);
-
-    await userDb.save();
-
-    const petTypeStr = ["none", "dog", "cat", "redPanda"][userDb.petType];
-    const randomSound =
-      speechBubbles[petTypeStr][
-        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
-      ];
-
-    const recentPats = (userDb.actionTimestamps.lastPat || []).filter(
-      (patTime) => new Date(patTime) >= timeStamp.tenMinutesAgo()
-    );
 
     if (userDb.energy < 5) {
       const lowEnergyEmbed = new EmbedBuilder()
@@ -86,21 +96,13 @@ module.exports = {
       return;
     }
 
-    if (recentPats.length >= 3) {
-      const tooManyPatsEmbed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setTitle("Too Many Pats")
-        .setDescription(
-          `${petName} has been patted too much recently. Try again later.`
-        )
-        .setTimestamp();
+    await userDb.save();
 
-      await interaction.editReply({
-        embeds: [tooManyPatsEmbed],
-        components: [],
-      });
-      return;
-    }
+    const petTypeStr = ["none", "dog", "cat", "redPanda"][userDb.petType];
+    const randomSound =
+      speechBubbles[petTypeStr][
+        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
+      ];
 
     const patEmbed = new EmbedBuilder()
       .setColor("#9e38fe")
