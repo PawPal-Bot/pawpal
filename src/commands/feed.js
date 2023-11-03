@@ -26,42 +26,44 @@ module.exports = {
     const lastFedTimes = userDb.actionTimestamps.lastFed;
     const lastDrankTimes = userDb.actionTimestamps.lastDrank;
 
-    const oldestFedTime =
-      lastFedTimes.length > 0 ? new Date(lastFedTimes[0]).getTime() : 0;
-    const oldestDrankTime =
-      lastDrankTimes.length > 0 ? new Date(lastDrankTimes[0]).getTime() : 0;
+    const now = new Date();
+    const tenMinutesAgo = now.getTime() - timeStamp.tenMinutes();
 
-    const timeUntilNextAllowedFeed = Math.max(
-      0,
-      Math.ceil((oldestFedTime + timeStamp.tenMinutes() - Date.now()) / 60000)
+    // Check if the pet can be fed based on timestamps and hunger level
+    const recentFedTimes = lastFedTimes.filter(
+      (time) => new Date(time).getTime() > tenMinutesAgo
     );
-    const timeUntilNextAllowedDrink = Math.max(
-      0,
-      Math.ceil((oldestDrankTime + timeStamp.tenMinutes() - Date.now()) / 60000)
-    );
-
     const canFeedFood =
-      userDb.hunger <= 100 &&
-      (timeUntilNextAllowedFeed <= 0 || lastFedTimes.length < 3);
+      userDb.hunger < 100 &&
+      (recentFedTimes.length < 3 ||
+        (recentFedTimes.length === 3 &&
+          new Date(lastFedTimes[2]).getTime() <= tenMinutesAgo));
+
+    // Check if the pet can be given water based on timestamps and thirst level
+    const recentDrankTimes = lastDrankTimes.filter(
+      (time) => new Date(time).getTime() > tenMinutesAgo
+    );
     const canFeedWater =
-      userDb.thirst <= 100 &&
-      (timeUntilNextAllowedDrink <= 0 || lastDrankTimes.length < 3);
+      userDb.thirst < 100 &&
+      (recentDrankTimes.length < 3 ||
+        (recentDrankTimes.length === 3 &&
+          new Date(lastDrankTimes[2]).getTime() <= tenMinutesAgo));
 
-    let description = `Hello there! It seems like ${petName} is ready for a meal or a drink. What would you like to give them? 
-    \nProviding a balanced diet of food and water will keep ${petName} happy and healthy.
-    \nChoose an option below to feed or hydrate your adorable companion! 🍲💧`;
+    let baseDescription = `Hello there!`;
 
-    if (canFeedFood && canFeedWater) {
-      description = `Hello there! It seems like ${petName} is ready for a meal or a drink. What would you like to give them? 
-        \nProviding a balanced diet of food and water will keep ${petName} happy and healthy.
-        \nChoose an option below to feed or hydrate your adorable companion! 🍲💧`;
-    } else if (canFeedFood && !canFeedWater) {
-      description = `${petName} is ready to eat, but they are not thirsty. They can drink again in ${timeUntilNextAllowedDrink} minutes.`;
+    if (canFeedFood && !canFeedWater) {
+      baseDescription += ` It seems like ${petName} is hungry and ready to eat.`;
     } else if (!canFeedFood && canFeedWater) {
-      description = `${petName} is thirsty, but they are not ready to eat. They can eat again in ${timeUntilNextAllowedFeed} minutes.`;
-    } else if (!canFeedFood && !canFeedWater) {
-      description = `${petName} isn't hungry or thirsty right now. They can eat again in ${timeUntilNextAllowedFeed} minutes, and drink again in ${timeUntilNextAllowedDrink} minutes.`;
+      baseDescription += ` It seems like ${petName} is thirsty and ready for a drink.`;
+    } else if (canFeedFood && canFeedWater) {
+      baseDescription += ` It seems like ${petName} is ready for both a meal and a drink.
+  \nChoose an option below to feed or hydrate your adorable companion! 🍲💧`;
+    } else {
+      baseDescription += ` Unfortunately, ${petName} isn't hungry or thirsty right now.`;
     }
+
+    let description = `${baseDescription}
+\nProviding a balanced diet of food and water will keep ${petName} happy and healthy.`;
 
     // Check if pet is sick and if feeding fails
     if (userDb.isSick) {
