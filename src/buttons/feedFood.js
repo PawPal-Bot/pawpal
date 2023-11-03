@@ -2,18 +2,17 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
 const timeStamps = require("../util/timeStamp");
+const variables = require("../data/variableNames");
 
 module.exports = {
   data: {
     name: "feedFood",
-    description: "Give your adorable pet a delicious treat!",
+    description: "Give your pet a delicious treat!",
   },
   async execute(interaction, client) {
     await interaction.deferUpdate();
 
     const userId = interaction.user.id;
-
-    // Fetch the latest user data from the database
     const userDb = await userModel.findOne({ userId });
     if (!userDb) {
       console.error("User not found:", userId);
@@ -72,22 +71,49 @@ module.exports = {
       }
     }
 
-    // Check if the pet can be fed
-    const oldestFedTime = new Date(
-      userDb.actionTimestamps.lastFed[0]
-    ).getTime();
-    const timeSinceOldestFed = now - oldestFedTime;
-    const canFeed =
-      timeSinceOldestFed >= timeStamps.tenMinutes() ||
-      userDb.actionTimestamps.lastFed.length < 3;
-
-    // Check if hunger is less than 100
     if (userDb.hunger >= 100) {
+      const fullEmbed = new EmbedBuilder()
+        .setColor("#9e38fe")
+        .setTitle("Oh no!")
+        .setDescription(
+          `${randomPetSound}! ${petName} is full and cannot eat any more!`
+        )
+        .setTimestamp();
+
+      await interaction.editReply({
+        embeds: [fullEmbed],
+        components: [],
+      });
+      return;
+    }
+
+    const lastThreeFed = userDb.actionTimestamps.lastFed.slice(-3);
+    let canFeed = userDb.hunger < 100;
+
+    if (lastThreeFed.length === 3) {
+      const tenMinutesAgo = now.getTime() - timeStamps.tenMinutes();
+      const feedTimesWithinTenMinutes = lastThreeFed.filter(
+        (time) => new Date(time).getTime() > tenMinutesAgo
+      ).length;
+
+      if (feedTimesWithinTenMinutes === 3) {
+        canFeed = false;
+      } else if (feedTimesWithinTenMinutes === 2) {
+        const thirdTime = new Date(lastThreeFed[0]).getTime();
+        if (thirdTime < tenMinutesAgo) {
+          canFeed = true;
+        } else {
+          canFeed = false;
+        }
+      }
+    }
+
+    if (!canFeed) {
       const tooMuchFoodEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
         .setTitle("Oops!")
         .setDescription(
-          `${petName} has eaten quite a bit recently and isn't hungry right now. Let's try again later.`
+          `${randomPetSound}! ${petName} has eaten quite a bit recently and isn't hungry right now. Let's try again later.`
         )
         .setTimestamp();
 
@@ -98,16 +124,24 @@ module.exports = {
       return;
     }
 
+    // Push the current timestamp to the lastFed array
     userDb.actionTimestamps.lastFed.push(now);
+    // Keep only the last 3 timestamps
     if (userDb.actionTimestamps.lastFed.length > 3) {
       userDb.actionTimestamps.lastFed.shift();
     }
-    userDb.hunger = Math.min(
-      userDb.hunger + Math.floor(Math.random() * 15) + 1,
-      100
-    );
+
+    // Calculate the new hunger level
+    const hungerIncrease = Math.floor(Math.random() * 15) + 1;
+    const newHungerLevel = Math.min(userDb.hunger + hungerIncrease, 100);
+
+    // Set the new hunger level
+    userDb.hunger = newHungerLevel;
+
+    // Increase the feed count
     userDb.feedCount += 1;
 
+    // Update the database
     await userModel.updateOne(
       { userId: interaction.user.id },
       {
@@ -123,10 +157,12 @@ module.exports = {
       .setColor("#9e38fe")
       .setTitle(`You treated ${petName} to a delicious snack!`)
       .setDescription(
-        `${randomPetSound}! ${petName} eagerly devours the tasty treat, and their hunger level is now ${userDb.hunger}.`
+        `${randomEatingSound}! ${petName} eagerly devours the tasty treat, and their hunger level is now ${variables.getHunger(
+          userDb.hunger
+        )}.`
       )
       .setFooter({
-        text: `Hunger Level: ${userDb.hunger}/100`,
+        text: `${variables.getHunger(userDb.hunger)}`,
       })
       .setTimestamp();
 
