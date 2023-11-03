@@ -22,32 +22,29 @@ module.exports = {
 
     const petName = userDb.petName ? userDb.petName : "Your pet";
 
-    // Get the timestamps of the last few feeding and drinking actions
-    const lastFedTimes = userDb.actionTimestamps.lastFed;
-    const lastDrankTimes = userDb.actionTimestamps.lastDrank;
+    // Get the timeStamp of the last few feeding and drinking actions
+    const lastFedTimes = userDb.actionTimeStamp.lastFed;
+    const lastDrankTimes = userDb.actionTimeStamp.lastDrank;
 
-    const now = new Date();
-    const tenMinutesAgo = now.getTime() - timeStamp.tenMinutes();
-
-    // Check if the pet can be fed based on timestamps and hunger level
+    // Check if the pet can be fed based on timeStamp and hunger level
     const recentFedTimes = lastFedTimes.filter(
-      (time) => new Date(time).getTime() > tenMinutesAgo
+      (time) => new Date(time).getTime() > timeStamp.tenMinutesAgo
     );
     const canFeedFood =
       userDb.hunger < 100 &&
       (recentFedTimes.length < 3 ||
         (recentFedTimes.length === 3 &&
-          new Date(lastFedTimes[2]).getTime() <= tenMinutesAgo));
+          new Date(lastFedTimes[2]).getTime() <= timeStamp.tenMinutesAgo));
 
-    // Check if the pet can be given water based on timestamps and thirst level
+    // Check if the pet can be given water based on timeStamp and thirst level
     const recentDrankTimes = lastDrankTimes.filter(
-      (time) => new Date(time).getTime() > tenMinutesAgo
+      (time) => new Date(time).getTime() > timeStamp.tenMinutesAgo
     );
     const canFeedWater =
       userDb.thirst < 100 &&
       (recentDrankTimes.length < 3 ||
         (recentDrankTimes.length === 3 &&
-          new Date(lastDrankTimes[2]).getTime() <= tenMinutesAgo));
+          new Date(lastDrankTimes[2]).getTime() <= timeStamp.tenMinutesAgo));
 
     let baseDescription = `Hello there!`;
 
