@@ -2,6 +2,7 @@ const { ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
 const timeStamp = require("../util/timeStamp");
+const variables = require("../data/variableNames");
 
 module.exports = {
   data: {
@@ -25,7 +26,9 @@ module.exports = {
         .setColor("#9e38fe")
         .setTitle(`${petName} is already ecstatic!`)
         .setDescription(`${petName} can't get any happier right now.`)
-        .setFooter({ text: `Happiness: ${userDb.happiness}/100` })
+        .setFooter({
+          text: `Happiness: ${variables.getHappiness(userDb.happiness)}`,
+        })
         .setTimestamp();
 
       await interaction.editReply({
@@ -107,7 +110,9 @@ module.exports = {
           happinessIncrease < baseHappinessIncrease ? "a little " : ""
         }happier now!`
       )
-      .setFooter({ text: `Happiness: ${userDb.happiness}/100` })
+      .setFooter({
+        text: `Happiness: ${variables.getHappiness(userDb.happiness)}`,
+      })
       .setTimestamp();
 
     const patAgainButton = new ButtonBuilder()
