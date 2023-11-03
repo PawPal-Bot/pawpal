@@ -1,7 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
-const timeStamps = require("../util/timeStamp");
+const timeStamp = require("../util/timeStamp");
 const variables = require("../data/variableNames");
 
 module.exports = {
@@ -18,6 +18,10 @@ module.exports = {
       console.error("User not found:", userId);
       return;
     }
+
+    // Ensure actionTimeStamp and its properties are initialized
+    userDb.actionTimeStamp = userDb.actionTimeStamp || {};
+    userDb.actionTimeStamp.lastDrank = userDb.actionTimeStamp.lastDrank || [];
 
     const petName = userDb.petName ? userDb.petName : "Your pet";
     const now = new Date();
@@ -44,19 +48,18 @@ module.exports = {
         Math.floor(Math.random() * speechBubbles[petTypeStr].length)
       ];
 
-    // Determine if the pet can drink based on thirst level and time since last drink
     let canDrink = userDb.thirst < 100;
 
-    // Check if there have been 3 drinks in the last 10 minutes
-    const lastThreeDrank = userDb.actionTimestamps.lastDrank.slice(-3);
-    if (lastThreeDrank.length === 3) {
-      const tenMinutesAgo = now.getTime() - timeStamps.tenMinutes();
-      const drinkTimesWithinTenMinutes = lastThreeDrank.filter(
-        (time) => new Date(time).getTime() > tenMinutesAgo
-      ).length;
+    const tenMinutesAgo = timeStamp.tenMinutesAgo();
 
-      // If there are 3 drink times within the last 10 minutes, disable drinking
-      canDrink = drinkTimesWithinTenMinutes < 3;
+    // Filter out the drink timestamps that are within the last 10 minutes
+    const recentDrinks = userDb.actionTimeStamp.lastDrank.filter(
+      (time) => new Date(time).getTime() > tenMinutesAgo
+    );
+
+    // If there are 3 or more recent drink times, the pet cannot drink more
+    if (recentDrinks.length >= 3) {
+      canDrink = false;
     }
 
     // If the pet cannot drink, send a message and return
@@ -76,11 +79,14 @@ module.exports = {
       return;
     }
 
+    // Ensure thirst is initialized before using it
+    userDb.thirst = userDb.thirst ?? 0;
+
     // Add the current timestamp to the last drank array
-    userDb.actionTimestamps.lastDrank.push(now);
+    userDb.actionTimeStamp.lastDrank.push(now);
     // Keep only the last 3 timestamps
-    while (userDb.actionTimestamps.lastDrank.length > 3) {
-      userDb.actionTimestamps.lastDrank.shift();
+    while (userDb.actionTimeStamp.lastDrank.length > 3) {
+      userDb.actionTimeStamp.lastDrank.shift();
     }
 
     // Increase thirst by a random amount
@@ -97,7 +103,7 @@ module.exports = {
       { userId: interaction.user.id },
       {
         $set: {
-          actionTimestamps: userDb.actionTimestamps,
+          "actionTimeStamp.lastDrank": userDb.actionTimeStamp.lastDrank,
           thirst: userDb.thirst,
           energy: userDb.energy,
           drinkCount: userDb.drinkCount,
