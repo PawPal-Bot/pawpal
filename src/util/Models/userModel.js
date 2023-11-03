@@ -29,7 +29,10 @@ const userProfile = new Schema(
     thirst: { type: Number, default: 50 },
     cleanliness: { type: Number, default: 50 },
     exerciseLevel: { type: Number, default: 0 },
+    huntCount: { type: Number, default: 0 },
     sleepLevel: { type: Number, default: 100 },
+    isAsleep: { type: Boolean, default: false },
+    sleepuntil: { type: Date, default: null },
     educationLevel: { type: Number, default: 0 },
     affection: { type: Number, default: 50 },
     miniGameScores: { type: Object, default: {} },
@@ -38,16 +41,18 @@ const userProfile = new Schema(
     feedCount: { type: Number, default: 0 },
     drinkCount: { type: Number, default: 0 },
     cleanedCount: { type: Number, default: 0 },
+    vetCount: { type: Number, default: 0 },
     socialisation: {
       friends: { type: Array, default: [] },
       competitionsEntered: { type: Number, default: 0 },
     },
     accessories: { type: Array, default: [] },
     housingCustomisations: { type: Array, default: [] },
-    actionTimestamps: {
+    actionTimeStamp: {
       lastFed: { type: [Date], default: [] },
       lastDrank: { type: [Date], default: [] },
       lastCleaned: { type: [Date], default: [] },
+      lastGroomed: { type: [Date], default: [] },
       lastMedicine: { type: [Date], default: [] },
       lastPlayed: { type: [Date], default: [] },
       lastEducated: { type: [Date], default: [] },
@@ -55,9 +60,12 @@ const userProfile = new Schema(
       lastWalked: { type: [Date], default: [] },
       lastPat: { type: [Date], default: [] },
       lastCuddled: { type: [Date], default: [] },
+      lastVetVisit: { type: [Date], default: [] },
+      lastSlept: { type: [Date], default: [] },
+      lastHunted: { type: [Date], default: [] },
     },
   },
-  { timestamps: true }
+  { timeStamp: true }
 );
 
 module.exports = model("userProfile", userProfile);
