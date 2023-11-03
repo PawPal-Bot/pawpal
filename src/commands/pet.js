@@ -176,28 +176,8 @@ module.exports = {
           inline: true,
         },
         {
-          name: "⏰ Last Pat",
-          value:
-            userDb.actionTimestamps.lastPat.length > 0
-              ? `<t:${Math.floor(
-                  userDb.actionTimestamps.lastPat.slice(-1)[0].getTime() / 1000
-                )}:R>`
-              : "Never",
-          inline: true,
-        },
-        {
           name: "🥄 Times Fed",
           value: userDb.feedCount.toString(),
-          inline: true,
-        },
-        {
-          name: "⏰ Last Fed",
-          value:
-            userDb.actionTimestamps.lastFed.length > 0
-              ? `<t:${Math.floor(
-                  userDb.actionTimestamps.lastFed.slice(-1)[0].getTime() / 1000
-                )}:R>`
-              : "Never",
           inline: true,
         },
         {
@@ -206,12 +186,31 @@ module.exports = {
           inline: true,
         },
         {
+          name: "⏰ Last Pat",
+          value:
+            userDb.actionTimeStamp.lastPat.length > 0
+              ? `<t:${Math.floor(
+                  userDb.actionTimeStamp.lastPat.slice(-1)[0].getTime() / 1000
+                )}:R>`
+              : "Never",
+          inline: true,
+        },
+        {
+          name: "⏰ Last Fed",
+          value:
+            userDb.actionTimeStamp.lastFed.length > 0
+              ? `<t:${Math.floor(
+                  userDb.actionTimeStamp.lastFed.slice(-1)[0].getTime() / 1000
+                )}:R>`
+              : "Never",
+          inline: true,
+        },
+        {
           name: "⏰ Last Drank",
           value:
-            userDb.actionTimestamps.lastDrank.length > 0
+            userDb.actionTimeStamp.lastDrank.length > 0
               ? `<t:${Math.floor(
-                  userDb.actionTimestamps.lastDrank.slice(-1)[0].getTime() /
-                    1000
+                  userDb.actionTimeStamp.lastDrank.slice(-1)[0].getTime() / 1000
                 )}:R>`
               : "Never",
           inline: true,
@@ -222,19 +221,35 @@ module.exports = {
           inline: true,
         },
         {
-          name: "⏰ Last Cleaned",
-          value:
-            userDb.actionTimestamps.lastCleaned.length > 0
-              ? `<t:${Math.floor(
-                  userDb.actionTimestamps.lastCleaned.slice(-1)[0].getTime() /
-                    1000
-                )}:R>`
-              : "Never",
+          name: "⏰ Last Cleaned or Groomed",
+          value: (() => {
+            const lastCleanedTimestamp =
+              userDb.actionTimeStamp.lastCleaned.length > 0
+                ? new Date(
+                    userDb.actionTimeStamp.lastCleaned.slice(-1)[0]
+                  ).getTime()
+                : 0;
+            const lastGroomedTimestamp =
+              userDb.actionTimeStamp.lastGroomed.length > 0
+                ? new Date(
+                    userDb.actionTimeStamp.lastGroomed.slice(-1)[0]
+                  ).getTime()
+                : 0;
+
+            const mostRecentTimestamp = Math.max(
+              lastCleanedTimestamp,
+              lastGroomedTimestamp
+            );
+
+            if (mostRecentTimestamp === 0) {
+              return "Never";
+            }
+
+            return `<t:${Math.floor(mostRecentTimestamp / 1000)}:R>`;
+          })(),
           inline: true,
         },
       ];
-
-      // Combine all fields into a single array
       const fieldsArray = [
         { name: "Basic Info", value: "\u200B", inline: false },
         ...basicInfoFields,
@@ -326,7 +341,7 @@ module.exports = {
                 },
                 accessories: [],
                 housingCustomisations: [],
-                actionTimestamps: {
+                actionTimeStamp: {
                   lastFed: [],
                   lastDrank: [],
                   lastCleaned: [],
@@ -373,7 +388,6 @@ module.exports = {
         return;
       }
 
-      // Now proceed with the rest of your code, userDb should be defined
       if (userDb.hasPet) {
         const alreadyHavePetEmbed = new EmbedBuilder()
           .setTitle("You already have a pet!")
