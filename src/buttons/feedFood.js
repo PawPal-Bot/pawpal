@@ -1,13 +1,13 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 const speechBubbles = require("../data/speechbubbles.json");
-const timeStamps = require("../util/timeStamp");
+const timeStamp = require("../util/timeStamp");
 const variables = require("../data/variableNames");
 
 module.exports = {
   data: {
     name: "feedFood",
-    description: "Give your pet a delicious treat!",
+    description: "Button to give your pet some food",
   },
   async execute(interaction, client) {
     await interaction.deferUpdate();
@@ -18,6 +18,10 @@ module.exports = {
       console.error("User not found:", userId);
       return;
     }
+
+    // Ensure actionTimeStamp and its properties are initialized
+    userDb.actionTimeStamp = userDb.actionTimeStamp || {};
+    userDb.actionTimeStamp.lastFed = userDb.actionTimeStamp.lastFed || [];
 
     const petName = userDb.petName ? userDb.petName : "Your pet";
     const now = new Date();
@@ -33,87 +37,38 @@ module.exports = {
       console.error("Invalid pet type:", userDb.petType);
       return;
     }
-    const randomPetSound =
-      speechBubbles[petTypeStr][
-        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
-      ];
+
     const randomEatingSound =
       speechBubbles.eatingSounds[
         Math.floor(Math.random() * speechBubbles.eatingSounds.length)
       ];
 
-    if (userDb.isSick) {
-      const randomChance = Math.random();
-      if (randomChance < 0.6) {
-        const feedFailEmbed = new EmbedBuilder()
-          .setColor("#9e38fe")
-          .setTitle("Uh-oh!")
-          .setDescription(
-            `${petName} isn't feeling well right now and doesn't want to eat. Let's try again later.`
-          )
-          .setTimestamp();
+    const randomPetSound =
+      speechBubbles[petTypeStr][
+        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
+      ];
 
-        const feedAgainButton = new ButtonBuilder()
-          .setCustomId("feedFood")
-          .setLabel("Feed Again")
-          .setStyle("Primary")
-          .setDisabled(true);
+    let canEat = userDb.hunger < 100;
 
-        await interaction.editReply({
-          embeds: [feedFailEmbed],
-          components: [new ActionRowBuilder().addComponents(feedAgainButton)],
-        });
+    const tenMinutesAgo = timeStamp.tenMinutesAgo();
 
-        userDb.actionTimestamps.lastFed.push(new Date(Date.now() + 3600000));
-        await userDb.save();
+    // Filter out the feed timestamps that are within the last 10 minutes
+    const recentFeeds = userDb.actionTimeStamp.lastFed.filter(
+      (time) => new Date(time).getTime() > tenMinutesAgo
+    );
 
-        return;
-      }
+    // If there are 3 or more recent feed times, the pet cannot eat more
+    if (recentFeeds.length >= 3) {
+      canEat = false;
     }
 
-    if (userDb.hunger >= 100) {
-      const fullEmbed = new EmbedBuilder()
+    // If the pet cannot eat, send a message and return
+    if (!canEat || userDb.hunger >= 100) {
+      const tooMuchFoodEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
         .setTitle("Oh no!")
         .setDescription(
-          `${randomPetSound}! ${petName} is full and cannot eat any more!`
-        )
-        .setTimestamp();
-
-      await interaction.editReply({
-        embeds: [fullEmbed],
-        components: [],
-      });
-      return;
-    }
-
-    const lastThreeFed = userDb.actionTimestamps.lastFed.slice(-3);
-    let canFeed = userDb.hunger < 100;
-
-    if (lastThreeFed.length === 3) {
-      const tenMinutesAgo = now.getTime() - timeStamps.tenMinutes();
-      const feedTimesWithinTenMinutes = lastThreeFed.filter(
-        (time) => new Date(time).getTime() > tenMinutesAgo
-      ).length;
-
-      if (feedTimesWithinTenMinutes === 3) {
-        canFeed = false;
-      } else if (feedTimesWithinTenMinutes === 2) {
-        const thirdTime = new Date(lastThreeFed[0]).getTime();
-        if (thirdTime < tenMinutesAgo) {
-          canFeed = true;
-        } else {
-          canFeed = false;
-        }
-      }
-    }
-
-    if (!canFeed) {
-      const tooMuchFoodEmbed = new EmbedBuilder()
-        .setColor("#9e38fe")
-        .setTitle("Oops!")
-        .setDescription(
-          `${randomPetSound}! ${petName} has eaten quite a bit recently and isn't hungry right now. Let's try again later.`
+          `${randomPetSound}! ${petName} has had enough to eat recently. Try again later.`
         )
         .setTimestamp();
 
@@ -124,56 +79,62 @@ module.exports = {
       return;
     }
 
-    // Push the current timestamp to the lastFed array
-    userDb.actionTimestamps.lastFed.push(now);
+    // Ensure hunger is initialized before using it
+    userDb.hunger = userDb.hunger ?? 0;
+
+    // Add the current timestamp to the last fed array
+    userDb.actionTimeStamp.lastFed.push(now);
     // Keep only the last 3 timestamps
-    if (userDb.actionTimestamps.lastFed.length > 3) {
-      userDb.actionTimestamps.lastFed.shift();
+    while (userDb.actionTimeStamp.lastFed.length > 3) {
+      userDb.actionTimeStamp.lastFed.shift();
     }
 
-    // Calculate the new hunger level
-    const hungerIncrease = Math.floor(Math.random() * 15) + 1;
-    const newHungerLevel = Math.min(userDb.hunger + hungerIncrease, 100);
+    // Increase hunger by a random amount
+    const increaseHungerBy = Math.floor(Math.random() * 15) + 1;
+    userDb.hunger = Math.min(userDb.hunger + increaseHungerBy, 100);
+    const energyIncrease = Math.floor(0.3 * increaseHungerBy);
+    userDb.energy = Math.min(userDb.energy + energyIncrease, 100);
 
-    // Set the new hunger level
-    userDb.hunger = newHungerLevel;
-
-    // Increase the feed count
+    // Increment the feed count
     userDb.feedCount += 1;
 
-    // Update the database
-    await userModel.updateOne(
+    // Update the user in the database
+    await userModel.findOneAndUpdate(
       { userId: interaction.user.id },
       {
         $set: {
-          actionTimestamps: userDb.actionTimestamps,
+          "actionTimeStamp.lastFed": userDb.actionTimeStamp.lastFed,
           hunger: userDb.hunger,
+          energy: userDb.energy,
           feedCount: userDb.feedCount,
         },
       }
     );
 
-    const updatedFeedEmbed = new EmbedBuilder()
-      .setColor("#9e38fe")
-      .setTitle(`You treated ${petName} to a delicious snack!`)
+    // Create the embed for a successful feed
+    const updatedFoodEmbed = new EmbedBuilder()
+      .setColor("#3399ff")
+      .setTitle(`You gave ${petName} some food!`)
       .setDescription(
-        `${randomEatingSound}! ${petName} eagerly devours the tasty treat, and their hunger level is now ${variables.getHunger(
+        `${randomPetSound}! ${petName} ${randomEatingSound}s the food happily! Their hunger level is now ${variables.getHunger(
           userDb.hunger
         )}.`
       )
       .setFooter({
-        text: `${variables.getHunger(userDb.hunger)}`,
+        text: `Hunger Level: ${variables.getHunger(userDb.hunger)}`,
       })
       .setTimestamp();
 
+    // Create the button for giving more food
     const feedAgainButton = new ButtonBuilder()
       .setCustomId("feedFood")
-      .setLabel("Feed Again")
+      .setLabel("Give More Food")
       .setStyle("Primary")
-      .setDisabled(!canFeed);
+      .setDisabled(!canEat);
 
+    // Send the reply with the embed and the button
     await interaction.editReply({
-      embeds: [updatedFeedEmbed],
+      embeds: [updatedFoodEmbed],
       components: [new ActionRowBuilder().addComponents(feedAgainButton)],
     });
   },
