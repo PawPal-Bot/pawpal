@@ -1,11 +1,13 @@
 const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
+const { Routes } = require("discord-api-types/v10");
 const { readdirSync } = require("fs");
 const { ChalkAdvanced } = require("chalk-advanced");
-
+const { AutoPoster } = require("topgg-autoposter");
+const userDB = require("../util/Models/userModel");
+require("dotenv").config();
 module.exports = async (client) => {
   const commandFiles = readdirSync("./src/commands/").filter((file) =>
-    file.endsWith(".js"),
+    file.endsWith(".js")
   );
 
   const commands = [];
@@ -20,41 +22,64 @@ module.exports = async (client) => {
     version: "10",
   }).setToken(process.env.TOKEN);
 
-  (async () => {
+  const registerCommands = async () => {
     try {
       if (process.env.STATUS === "PRODUCTION") {
+        if (process.env.TOPGG_TOKEN) {
+          AutoPoster(process.env.TOPGG_TOKEN, client);
+        }
         await rest.put(Routes.applicationCommands(client.user.id), {
           body: commands,
         });
         console.log(
           `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-            ">",
+            ">"
           )} ${ChalkAdvanced.green(
-            "Successfully registered commands globally",
-          )}`,
+            "Successfully registered commands globally"
+          )}`
         );
       } else {
         await rest.put(
           Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID),
           {
             body: commands,
-          },
+          }
         );
 
         console.log(
           `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-            ">",
-          )} ${ChalkAdvanced.green(
-            "Successfully registered commands locally",
-          )}`,
+            ">"
+          )} ${ChalkAdvanced.green("Successfully registered commands locally")}`
         );
       }
     } catch (err) {
-      if (err) console.error(err);
+      if (err && err.request && err.response) {
+        console.error(
+          `HTTP error: ${err.response.status} ${err.response.statusText}`
+        );
+      } else {
+        console.error(err);
+      }
     }
-  })();
+  };
+
+  await registerCommands();
+
+  const totalUsers = await userDB.countDocuments();
+  const totalPets = await userDB.countDocuments({ hasPet: true });
+
+  const setStatus = () => {
+    if (!client.user) return;
   client.user.setPresence({
-    activities: [{ name: `${process.env.STATUSBOT}` }],
-    status: `${process.env.DISCORDSTATUS}`,
+    activities: [
+      { name: `${totalUsers} users keep ${totalPets} pets`, type: 3 },
+      { name: `Enjoying a lovely day in the park with ${totalPets} furry friends`, type: 4, emoji: '🐶'},
+    ],
+    status: 'online',
   });
+  };
+
+  setTimeout(() => setStatus(), 35 * 10);
+  setInterval(() => setStatus(), 60 * 60 * 1000);
+
 };

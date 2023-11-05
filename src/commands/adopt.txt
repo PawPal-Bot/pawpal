@@ -21,11 +21,16 @@ module.exports = {
         .setNameLocalizations({
           de: "adoptieren",
         })
-        .setDescription("Adopt a pet!"),
+        .setDescription("Adopt a pet!")
     ),
 
   async execute(interaction, client) {
     const userDb = await userModel.findOne({ userId: interaction.user.id });
+
+    if (!userDb) {
+      await interaction.reply("You don't have a profile in the database!");
+      return;
+    }
 
     const adoptEmbed = new EmbedBuilder()
 
@@ -66,7 +71,7 @@ module.exports = {
 
     if (userDb.petType !== 0) {
       adoptEmbed.setDescription(
-        "You already have a pet! You can't adopt another one!",
+        "You already have a pet! You can't adopt another one!"
       );
       adoptButton.setDisabled(true);
     }

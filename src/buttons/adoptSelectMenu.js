@@ -3,6 +3,7 @@ const {
   ChannelType,
   ChannelSelectMenuBuilder,
   StringSelectMenuBuilder,
+  EmbedBuilder,
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
 module.exports = {
@@ -37,7 +38,7 @@ module.exports = {
             description: "Adopt a red panda!",
             emoji: "🐼",
           },
-        ]),
+        ])
     );
 
     const petMap = {
@@ -50,15 +51,18 @@ module.exports = {
       .findOneAndUpdate(
         { userId: interaction.user.id },
         { petType: interaction.values[0], hasPet: true },
-        { upsert: true },
+        { upsert: true }
       )
       .exec();
 
-    await interaction.update({ components: [inter] });
+    const updatedEmbed = new EmbedBuilder()
+      .setTitle("Congratulations!")
+      .setDescription("You've adopted a " + petMap[interaction.values[0]] + "!")
+      .setColor("#9e38fe");
 
-    return interaction.followUp({
-      content: "You have adopted a " + petMap[interaction.values[0]] + "!",
-      ephemeral: true,
+    await interaction.update({
+      embeds: [updatedEmbed],
+      components: [],
     });
   },
 };

@@ -11,23 +11,28 @@
     "discord.js": "^14.9.0",
     "dotenv": "^16.0.3",
     "mongoose": "^7.6.3",
-    "prettier": "^3.0.1"
+    "prettier": "^3.0.1",
+    "topgg-autoposter": "^2.0.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "2.0.20"
   },
   "name": "pawpal",
-  "description": "This template provides boilerplate code for Discord.js v14. Ready for slash command and everything you need to start out with your bot!",
+  "description": "PawPal is a Discord bot that brings virtual pets, known as PawPals, to your server. Care for your adorable PawPal, watch them grow, play games, and nurture a special digital bond with your furry companion.",
   "version": "1.0.0",
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mezotv/pawpal.git"
+    "url": "git+https://github.com/PawPal-Bot/pawpal.git"
   },
-  "author": "Dominik Koch",
+  "authors": [
+    "Dominik Koch",
+    "Provant15"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mezotv/pawpal/issues"
+    "url": "https://github.com/PawPal-Bot/pawpal/issues"
   },
-  "homepage": "https://github.com/mezotv/pawpal#readme"
+  "homepage": "https://github.com/PawPal-Bot/pawpal#readme"
 }

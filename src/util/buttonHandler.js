@@ -14,15 +14,15 @@ module.exports = class ButtonHandler {
    */
   load() {
     for (const file of readdirSync(
-      path.join(__dirname, "..", "buttons"),
+      path.join(__dirname, "..", "buttons")
     ).filter((file) => file.endsWith(".js"))) {
       const button = require(`../buttons/${file}`);
       this.client.buttons.set(button.data.name, button);
     }
     console.log(
       `${ChalkAdvanced.white("AdoptMe Bot")} ${ChalkAdvanced.gray(
-        ">",
-      )} ${ChalkAdvanced.green("Successfully loaded buttons")}`,
+        ">"
+      )} ${ChalkAdvanced.green("Successfully loaded buttons")}`
     );
   }
 
