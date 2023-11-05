@@ -99,7 +99,6 @@ module.exports = {
 };
 
 async function handleClean(interaction, userDb, petName, now, randomPetSound) {
-  // Ensure actionTimeStamp and its properties are initialized
   if (!userDb.actionTimeStamp) userDb.actionTimeStamp = {};
   if (!userDb.actionTimeStamp.lastCleaned)
     userDb.actionTimeStamp.lastCleaned = [];
@@ -107,8 +106,7 @@ async function handleClean(interaction, userDb, petName, now, randomPetSound) {
   if (typeof userDb.cleanedCount === "undefined") {
     userDb.cleanedCount = 0;
   }
-
-  // Retrieve the last cleaned and last groomed time from the database document
+t
   const lastCleanedTime =
     userDb.actionTimeStamp.lastCleaned.length > 0
       ? new Date(userDb.actionTimeStamp.lastCleaned.slice(-1)[0]).getTime()
@@ -118,7 +116,6 @@ async function handleClean(interaction, userDb, petName, now, randomPetSound) {
       ? new Date(userDb.actionTimeStamp.lastGroomed.slice(-1)[0]).getTime()
       : 0;
 
-  // Check if last cleaned or groomed time is within the last 12 hours
   if (
     now - lastCleanedTime < timeStamp.twelveHours() ||
     now - lastGroomedTime < timeStamp.twelveHours()
@@ -145,34 +142,27 @@ async function handleClean(interaction, userDb, petName, now, randomPetSound) {
     return;
   }
 
-  // Random cleanliness increase between 5 and 20
   const cleanlinessIncrease = Math.floor(Math.random() * 16) + 5; // 5 to 20
   userDb.cleanliness = Math.min(100, userDb.cleanliness + cleanlinessIncrease);
 
-  // Calculate happiness increase in the same manner as grooming
   let happinessIncrease = cleanlinessIncrease * 0.25;
   if (cleanlinessIncrease >= 15) {
-    // Assuming 15 is the threshold for extra happiness
     happinessIncrease += 10;
   }
   userDb.happiness = Math.min(100, userDb.happiness + happinessIncrease);
 
-  // Update the lastCleaned timestamp
   userDb.actionTimeStamp.lastCleaned.push(new Date(now).toISOString());
 
-  // Keep only the last 3 timestamps for lastCleaned
   while (userDb.actionTimeStamp.lastCleaned.length > 3) {
     userDb.actionTimeStamp.lastCleaned.shift();
   }
 
   userDb.cleanedCount += 1;
 
-  // Save the updated userDb
   await userDb.save();
 
-  // Create an embed for the reply
   const embed = new EmbedBuilder()
-    .setColor("#ADD8E6") // Light blue color for a clean pet
+    .setColor("#ADD8E6")
     .setTitle("Cleaning Successful!")
     .setDescription(`${randomPetSound} ${petName} is looking fresh and clean.`)
     .addFields(
@@ -185,7 +175,6 @@ async function handleClean(interaction, userDb, petName, now, randomPetSound) {
     )
     .setTimestamp();
 
-  // Reply with the embed
   await interaction.reply({ embeds: [embed] });
 }
 
@@ -196,7 +185,6 @@ async function handleGroom(
   nowTimestamp,
   randomPetSound
 ) {
-  // Ensure actionTimeStamp and its properties are initialized
   if (!userDb.actionTimeStamp) userDb.actionTimeStamp = {};
   if (!userDb.actionTimeStamp.lastGroomed)
     userDb.actionTimeStamp.lastGroomed = [];
@@ -207,7 +195,7 @@ async function handleGroom(
     userDb.cleanedCount = 0;
   }
 
-  const now = new Date(nowTimestamp); // Ensure 'now' is a Date object.
+  const now = new Date(nowTimestamp);
   const lastGroomedTime =
     userDb.actionTimeStamp.lastGroomed.length > 0
       ? new Date(userDb.actionTimeStamp.lastGroomed.slice(-1)[0]).getTime()
@@ -217,7 +205,6 @@ async function handleGroom(
       ? new Date(userDb.actionTimeStamp.lastCleaned.slice(-1)[0]).getTime()
       : 0;
 
-  // Check if the pet was cleaned in the last 6 hours
   if (now.getTime() - lastCleanedTime < timeStamp.sixHours()) {
     const remainingTime =
       timeStamp.sixHours() - (now.getTime() - lastCleanedTime);
@@ -241,7 +228,6 @@ async function handleGroom(
   userDb.cleanedCount += 1;
 
   if (timeSinceLastGroomed < timeStamp.twelveHours()) {
-    // Ensure twelveHours is called if it's a function
     const remainingTime = timeStamp.twelveHours() - timeSinceLastGroomed;
     const remainingHours = Math.floor(remainingTime / (60 * 60 * 1000));
     const remainingMinutes = Math.floor(
@@ -275,17 +261,14 @@ async function handleGroom(
 
   userDb.actionTimeStamp.lastGroomed.push(now.toISOString());
 
-  // Keep only the last 3 timestamps for lastGroomed
   while (userDb.actionTimeStamp.lastGroomed.length > 3) {
     userDb.actionTimeStamp.lastGroomed.shift();
   }
 
-  // Save the updated userDb
   await userDb.save();
 
-  // Create an embed for the reply
   const embed = new EmbedBuilder()
-    .setColor("#FFD700") // Gold color for a well-groomed pet
+    .setColor("#FFD700")
     .setTitle("Grooming Successful!")
     .setDescription(`${randomPetSound} ${message}`)
     .addFields(
@@ -296,31 +279,27 @@ async function handleGroom(
         inline: true,
       }
     )
-    .setTimestamp(now); // Use the same 'now' object for the timestamp
+    .setTimestamp(now);
 
-  // Reply with the embed
   await interaction.reply({ embeds: [embed] });
 }
 
 async function handleFeed(interaction, userDb, petName, now, randomPetSound) {
-  // Ensure actionTimeStamp and its properties are initialized
   userDb.actionTimeStamp = userDb.actionTimeStamp || {};
   userDb.actionTimeStamp.lastFed = userDb.actionTimeStamp.lastFed || [];
   userDb.actionTimeStamp.lastDrank = userDb.actionTimeStamp.lastDrank || [];
 
-  // Check if the pet can be fed based on timeStamp and hunger level
   const canFeedFood = checkIfCanFeed(
     userDb.actionTimeStamp.lastFed,
     userDb.hunger
   );
 
-  // Check if the pet can be given water based on timeStamp and thirst level
+
   const canFeedWater = checkIfCanFeed(
     userDb.actionTimeStamp.lastDrank,
     userDb.thirst
   );
 
-  // Check if pet is sick and adjust the description message accordingly
   let description = `${petName} looks `;
   if (userDb.isSick) {
     description += `a bit under the weather and might not feel like eating or drinking. Please try again later.`;
@@ -337,14 +316,12 @@ async function handleFeed(interaction, userDb, petName, now, randomPetSound) {
     }
   }
 
-  // Create the feed embed
   const feedEmbed = new EmbedBuilder()
     .setColor("#0099ff")
     .setTitle(`Time to care for ${petName}`)
     .setDescription(description)
     .setTimestamp();
 
-  // Create the buttons for feeding food and water
   const feedFoodButton = new ButtonBuilder()
     .setCustomId("feedFood")
     .setLabel("Give Food")
@@ -359,13 +336,11 @@ async function handleFeed(interaction, userDb, petName, now, randomPetSound) {
     .setEmoji("💧")
     .setDisabled(!canFeedWater || userDb.isSick);
 
-  // Prepare the action row with the buttons
   const actionRow = new ActionRowBuilder().addComponents(
     feedFoodButton,
     feedWaterButton
   );
 
-  // Reply with the embed and action row
   await interaction.reply({
     embeds: [feedEmbed],
     components: [actionRow],
@@ -382,21 +357,26 @@ function checkIfCanFeed(actionTimestamps, level) {
 
 async function handleSleep(interaction, userDb, petName, now) {
   if (!userDb.actionTimeStamp) userDb.actionTimeStamp = {};
-  if (!userDb.actionTimeStamp.lastSlept) userDb.actionTimeStamp.lastSlept = now;
+  if (!Array.isArray(userDb.actionTimeStamp.lastSlept) || userDb.actionTimeStamp.lastSlept.length === 0) {
+    userDb.actionTimeStamp.lastSlept = [now]; 
+  }
+
   if (typeof userDb.isAsleep === "undefined") userDb.isAsleep = false;
   if (!userDb.sleepUntil) userDb.sleepUntil = now;
-
   if (typeof userDb.sleepLevel === "undefined") userDb.sleepLevel = 0;
   if (typeof userDb.energy === "undefined") userDb.energy = 0;
 
-  if (userDb.energy > 80 || userDb.sleepLevel > 80) {
+  const isTired = userDb.energy < 30 || userDb.sleepLevel < 30;
+
+  if (!isTired && (userDb.energy > 80 || userDb.sleepLevel > 80)) {
     await interaction.reply(
       `${petName} is not tired yet. Perhaps take them out for some exercise to reduce their energy levels.`
     );
     return;
   }
 
-  const lastSleptTime = new Date(userDb.actionTimeStamp.lastSlept).getTime();
+  let lastSleptTime = new Date(userDb.actionTimeStamp.lastSlept[0]).getTime();
+
   if (isNaN(lastSleptTime)) {
     console.error(`Invalid lastSleptTime for pet ${petName}`);
     await interaction.reply(
@@ -406,7 +386,8 @@ async function handleSleep(interaction, userDb, petName, now) {
   }
 
   const timeSinceLastSlept = now - lastSleptTime;
-  const sleepCooldown = 4 * 60 * 60 * 1000; 
+
+  const sleepCooldown = (userDb.actionTimeStamp.lastSlept.length > 1) && !isTired ? 4 * 60 * 60 * 1000 : 0;
 
   if (userDb.isAsleep) {
     const sleepUntilTime = new Date(userDb.sleepUntil).getTime();
@@ -441,9 +422,12 @@ async function handleSleep(interaction, userDb, petName, now) {
         );
         return;
       }
-      const sleepPercentage = sleepDuration / (24 * 60 * 60 * 1000);
-      const sleepPoints = Math.round(sleepPercentage * 100);
-      userDb.sleepLevel = Math.min(userDb.sleepLevel + sleepPoints, 100);
+
+      const maxSleepDuration = 4 * 60 * 60 * 1000;
+      const recoveryPercentage = (sleepDuration / maxSleepDuration);
+
+      userDb.energy = Math.min(userDb.energy + Math.round(recoveryPercentage * 100), 100);
+      userDb.sleepLevel = Math.min(userDb.sleepLevel + Math.round(recoveryPercentage * 100), 100);
     }
   }
 
@@ -460,17 +444,19 @@ async function handleSleep(interaction, userDb, petName, now) {
     return;
   }
 
-  const sleepDurationMs = (Math.floor(Math.random() * 8) + 1) * 60 * 60 * 1000;
+  const sleepDurationMs = (Math.floor(Math.random() * 4) + 1) * 60 * 60 * 1000;
   const sleepUntil = new Date(now + sleepDurationMs);
 
   userDb.isAsleep = true;
-  userDb.sleepUntil = sleepUntil.toISOString();
-  userDb.actionTimeStamp.lastSlept = now;
+  userDb.sleepUntil = sleepUntil;
+  userDb.actionTimeStamp.lastSlept.unshift(now);
 
   await userDb.save();
 
   await interaction.reply(`${petName} is now sleeping.`);
 }
+
+
 
 async function handleVet(interaction, userDb, petName, now) {
   if (!userDb.actionTimeStamp) userDb.actionTimeStamp = {};
@@ -484,7 +470,6 @@ async function handleVet(interaction, userDb, petName, now) {
       : 0;
   const timeSinceLastVetVisit = now - lastVetVisitTime;
 
-  // If the pet is currently sick and it's been less than 6 hours since the last vet visit, block all actions
   if (userDb.isSick && timeSinceLastVetVisit < timeStamp.sixHours()) {
     const remainingHours = Math.ceil(
       (timeStamp.sixHours() - timeSinceLastVetVisit) / (60 * 60 * 1000)
@@ -495,7 +480,6 @@ async function handleVet(interaction, userDb, petName, now) {
     return;
   }
 
-  // Check if the pet has been to the vet within a week and is not sick
   if (!userDb.isSick && timeSinceLastVetVisit < timeStamp.oneWeek()) {
     const remainingDays = Math.ceil(
       (timeStamp.oneWeek() - timeSinceLastVetVisit) / (24 * 60 * 60 * 1000)
@@ -506,7 +490,6 @@ async function handleVet(interaction, userDb, petName, now) {
     return;
   }
 
-  // Randomly determine vet findings and set sick status
   let vetFindings;
   const randomChance = Math.random();
   if (randomChance < 0.5) {
@@ -532,18 +515,14 @@ async function handleVet(interaction, userDb, petName, now) {
     userDb.medicineCount = (userDb.medicineCount || 0) + 4;
   }
 
-  // Update last vet visit time
   userDb.actionTimeStamp.lastVetVisit.push(new Date(now).toISOString());
 
-  // Keep only the last 5 timestamps for lastVetVisit
   if (userDb.actionTimeStamp.lastVetVisit.length > 5) {
     userDb.actionTimeStamp.lastVetVisit.shift();
   }
 
-  // Save the updated userDb
   await userDb.save();
 
-  // Reply with the vet findings
   await interaction.reply(
     `${petName} has been taken to the vet for a routine checkup and ${vetFindings}.`
   );
