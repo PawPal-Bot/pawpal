@@ -1,10 +1,10 @@
 const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
+const { Routes } = require("discord-api-types/v10");
 const { readdirSync } = require("fs");
 const { ChalkAdvanced } = require("chalk-advanced");
+const { AutoPoster } = require("topgg-autoposter");
 const userDB = require("../util/Models/userModel");
-const { ActivityTypes } = require("discord.js");
-
+require("dotenv").config();
 module.exports = async (client) => {
   const commandFiles = readdirSync("./src/commands/").filter((file) =>
     file.endsWith(".js")
@@ -25,6 +25,9 @@ module.exports = async (client) => {
   const registerCommands = async () => {
     try {
       if (process.env.STATUS === "PRODUCTION") {
+        if (process.env.TOPGG_TOKEN) {
+          AutoPoster(process.env.TOPGG_TOKEN, client);
+        }
         await rest.put(Routes.applicationCommands(client.user.id), {
           body: commands,
         });
