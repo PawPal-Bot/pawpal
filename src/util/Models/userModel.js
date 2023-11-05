@@ -32,7 +32,7 @@ const userProfile = new Schema(
     huntCount: { type: Number, default: 0 },
     sleepLevel: { type: Number, default: 100 },
     isAsleep: { type: Boolean, default: false },
-    sleepuntil: { type: Date, default: null },
+    sleepUntil: { type: Date, default: null },
     educationLevel: { type: Number, default: 0 },
     affection: { type: Number, default: 50 },
     miniGameScores: { type: Object, default: {} },
