@@ -57,7 +57,24 @@ module.exports = async function valueDrainInterval() {
         }
       }
 
+      const now = Date.now();
+      
+      const sleepUntilTime = user.sleepUntil ? new Date(user.sleepUntil).getTime() : null;
+      
+      const hasSleepUntilPassed = sleepUntilTime ? now > sleepUntilTime : false;
+      
+      if (hasSleepUntilPassed) {
+        user.isAsleep = false;
+        const lastSleptTime = new Date(user.actionTimeStamp.lastSlept[0]).getTime();
+        const sleepDuration = sleepUntilTime - lastSleptTime;
+        const maxSleepDuration = 4 * 60 * 60 * 1000;
+        const recoveryPercentage = sleepDuration / maxSleepDuration;
+        user.energy = Math.min(user.energy + Math.round(recoveryPercentage * 100), 100);
+        user.sleepLevel = Math.min(user.sleepLevel + Math.round(recoveryPercentage * 100), 100);
+      }
+
       let update = {
+        isAsleep: user.isAsleep, 
         happiness: Math.max(user.happiness - happinessDrainRate, 0),
         affection: Math.max(user.affection - affectionDrainRate, 0),
         energy: user.isSick
