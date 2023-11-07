@@ -106,7 +106,7 @@ async function handleClean(interaction, userDb, petName, now, randomPetSound) {
   if (typeof userDb.cleanedCount === "undefined") {
     userDb.cleanedCount = 0;
   }
-t
+  
   const lastCleanedTime =
     userDb.actionTimeStamp.lastCleaned.length > 0
       ? new Date(userDb.actionTimeStamp.lastCleaned.slice(-1)[0]).getTime()
