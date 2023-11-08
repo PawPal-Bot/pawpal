@@ -3,8 +3,11 @@ const {
   EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
+  ButtonBuilder,
+  ButtonStyle
 } = require("discord.js");
 const userModel = require("../util/Models/userModel");
+const { generateEmbeds, generateButtons } = require("../util/petUtils");
 const variables = require("../data/variableNames");
 
 module.exports = {
@@ -74,225 +77,20 @@ module.exports = {
 
       await interaction.reply(`Your pet's name has been set to ${newName}!`);
     } else if (subcommand === "about") {
-      const userDb = await userModel.findOne({ userId: interaction.user.id });
-
-      if (!userDb || userDb.petType === 0) {
-        await interaction.reply({
-          content:
-            "You don't have a pet to look up. Run </get started:1168885856032014448>",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const petName = userDb.petName || "Your pet";
-
-      // Basic Info
-
-      const basicInfoFields = [
-        {
-          name: "🪧 Pet Name",
-          value: userDb.petName || "You haven't chosen a name",
-          inline: true,
-        },
-        {
-          name: ["Type", "🦴 Type", "🐠 Type", "🎍 Type"][userDb.petType],
-          value: ["❌ None", "Dog", "Cat", "Red Panda"][userDb.petType],
-          inline: true,
-        },
-        {
-          name: "👶 Life Stage & Age",
-          value: `${
-            ["Baby", "Child", "Teen", "Adult"][userDb.lifeStage]
-          }, aged ${userDb.age}`,
-          inline: true,
-        },
-      ];
-
-      // Health & Needs
-      const healthNeedsFields = [
-        {
-          name: "❤️ Health",
-          value: `${variables.getHealth(userDb.health)}`,
-          inline: true,
-        },
-        {
-          name: "🍔 Hunger",
-          value: `${variables.getHunger(userDb.hunger)}`,
-          inline: true,
-        },
-        {
-          name: "💧 Thirst",
-          value: `${variables.getThirst(userDb.thirst)}`,
-          inline: true,
-        },
-        {
-          name: "🏃🏾‍♂️ Energy Level",
-          value: `${variables.getEnergy(userDb.energy)}`,
-          inline: true,
-        },
-        {
-          name: "💕 Affection",
-          value: `${variables.getAffection(userDb.affection)}`,
-          inline: true,
-        },
-        {
-          name: "❤️ Happiness",
-          value: `${variables.getHappiness(userDb.happiness)}`,
-          inline: true,
-        },
-        {
-          name: "😷 Is Sick?",
-          value: userDb.isSick ? "Yes" : "No",
-          inline: true,
-        },
-        {
-          name: "🎓 Education Level",
-          value: `${variables.getEducation(userDb.educationLevel)}`,
-          inline: true,
-        },
-        {
-          name: "🛁 Cleanliness",
-          value: `${variables.getCleanliness(userDb.cleanliness)}`,
-          inline: true,
-        },
-        {
-          name: "🏃 Exercise Level",
-          value: `${variables.getExercise(userDb.exerciseLevel)}`,
-          inline: true,
-        },
-        {
-          name: "💤 Sleep Level",
-          value: `${variables.getSleep(userDb.sleepLevel)}`,
-          inline: true,
-        },
-      ];
-
-      // Interactions
-      const interactionsFields = [
-        {
-          name: "🖐️ Times Pat",
-          value: userDb.patCount.toString(),
-          inline: true,
-        },
-        {
-          name: "🥄 Times Fed",
-          value: userDb.feedCount.toString(),
-          inline: true,
-        },
-        {
-          name: "💦 Times Drank",
-          value: userDb.drinkCount.toString(),
-          inline: true,
-        },
-        {
-          name: "⏰ Last Pat",
-          value:
-            userDb.actionTimeStamp.lastPat.length > 0
-              ? `<t:${Math.floor(
-                  userDb.actionTimeStamp.lastPat.slice(-1)[0].getTime() / 1000
-                )}:R>`
-              : "Never",
-          inline: true,
-        },
-        {
-          name: "⏰ Last Fed",
-          value:
-            userDb.actionTimeStamp.lastFed.length > 0
-              ? `<t:${Math.floor(
-                  userDb.actionTimeStamp.lastFed.slice(-1)[0].getTime() / 1000
-                )}:R>`
-              : "Never",
-          inline: true,
-        },
-        {
-          name: "⏰ Last Drank",
-          value:
-            userDb.actionTimeStamp.lastDrank.length > 0
-              ? `<t:${Math.floor(
-                  userDb.actionTimeStamp.lastDrank.slice(-1)[0].getTime() / 1000
-                )}:R>`
-              : "Never",
-          inline: true,
-        },
-        {
-          name: "🛁 Times Cleaned",
-          value: userDb.cleanedCount.toString(),
-          inline: true,
-        },
-        {
-          name: "⏰ Last Cleaned or Groomed",
-          value: (() => {
-            const lastCleanedTimestamp =
-              userDb.actionTimeStamp.lastCleaned.length > 0
-                ? new Date(
-                    userDb.actionTimeStamp.lastCleaned.slice(-1)[0]
-                  ).getTime()
-                : 0;
-            const lastGroomedTimestamp =
-              userDb.actionTimeStamp.lastGroomed.length > 0
-                ? new Date(
-                    userDb.actionTimeStamp.lastGroomed.slice(-1)[0]
-                  ).getTime()
-                : 0;
-
-            const mostRecentTimestamp = Math.max(
-              lastCleanedTimestamp,
-              lastGroomedTimestamp
-            );
-
-            if (mostRecentTimestamp === 0) {
-              return "Never";
-            }
-
-            return `<t:${Math.floor(mostRecentTimestamp / 1000)}:R>`;
-          })(),
-          inline: true,
-        },
-      ];
-      const fieldsArray = [
-        { name: "Basic Info", value: "\u200B", inline: false },
-        ...basicInfoFields,
-
-        { name: "Health & Needs", value: "\u200B", inline: false },
-        ...healthNeedsFields,
-
-        { name: "Interactions", value: "\u200B", inline: false },
-        ...interactionsFields,
-      ];
-
-      const baseImageUrl = "https://fjord.au/assets/pawpal";
-      const petTypeFolder =
-        userDb.petType === 1
-          ? "dog"
-          : userDb.petType === 2
-          ? "cat"
-          : "redpanda";
-      let emotionSuffix;
-
-      if (userDb.happiness < 30) {
-        emotionSuffix = "A"; // Angry
-      } else if (userDb.happiness <= 60) {
-        emotionSuffix = "N"; // Neutral
-      } else {
-        emotionSuffix = "H"; // Happy
-      }
-
-      const imageUrl = `${baseImageUrl}/${petTypeFolder}/${petTypeFolder}${emotionSuffix}.png`;
-
-      const petInfoEmbed = new EmbedBuilder()
-        .setThumbnail(imageUrl)
-        .setAuthor({
-          name: petName + "'s Information",
-          iconURL: imageUrl,
-        })
-        .addFields(fieldsArray)
-        .setColor("#9e38fe")
-        .setFooter({
-          text: `Pet information for ${interaction.user.username} | PawPal`,
-        });
-
-      await interaction.reply({ embeds: [petInfoEmbed] });
+          const userDb = await userModel.findOne({ userId: interaction.user.id });
+    if (!userDb || userDb.petType === 0) {
+      await interaction.reply({
+        content: "You don't have a pet to look up. Run </get started:1168885856032014448>",
+        ephemeral: true
+      });
+      return;
+    }
+    
+    const embeds = generateEmbeds(userDb);
+    await interaction.reply({
+      embeds: [embeds[0]],
+      components: [generateButtons(0, embeds.length)]
+    });
     } else if (subcommand === "release") {
       const userDb = await userModel.findOne({ userId: interaction.user.id });
 
@@ -306,56 +104,54 @@ module.exports = {
       }
 
       try {
-        await userModel
-          .findOneAndUpdate(
-            { userId: interaction.user.id },
-            {
-              $set: {
-                petName: "",
-                petType: 0,
-                hasPet: false,
-                lifeStage: 0,
-                age: 0,
-                health: 100,
-                isSick: false,
-                medicineCount: 0,
-                discipline: 0,
-                trainingLevel: 0,
-                happiness: 50,
-                energy: 100,
-                hunger: 50,
-                thirst: 50,
-                cleanliness: 50,
-                exerciseLevel: 0,
-                sleepLevel: 100,
-                educationLevel: 0,
-                affection: 50,
-                miniGameScores: {},
-                patCount: 0,
-                feedCount: 0,
-                drinkCount: 0,
-                cleanedCount: 0,
-                socialisation: {
-                  friends: [],
-                  competitionsEntered: 0,
-                },
-                accessories: [],
-                housingCustomisations: [],
-                actionTimeStamp: {
-                  lastFed: [],
-                  lastDrank: [],
-                  lastCleaned: [],
-                  lastMedicine: [],
-                  lastPlayed: [],
-                  lastEducated: [],
-                  lastWalked: [],
-                  lastPat: [],
-                },
+        await userModel.findOneAndUpdate(
+          { userId: interaction.user.id },
+          {
+            $set: {
+              petName: "",
+              petType: 0,
+              hasPet: false,
+              lifeStage: 0,
+              age: 0,
+              health: 100,
+              isSick: false,
+              medicineCount: 0,
+              discipline: 0,
+              trainingLevel: 0,
+              happiness: 50,
+              energy: 100,
+              hunger: 50,
+              thirst: 50,
+              cleanliness: 50,
+              exerciseLevel: 0,
+              sleepLevel: 100,
+              educationLevel: 0,
+              affection: 50,
+              miniGameScores: {},
+              patCount: 0,
+              feedCount: 0,
+              drinkCount: 0,
+              cleanedCount: 0,
+              socialisation: {
+                friends: [],
+                competitionsEntered: 0,
+              },
+              accessories: [],
+              housingCustomisations: [],
+              actionTimeStamp: {
+                lastFed: [],
+                lastDrank: [],
+                lastCleaned: [],
+                lastMedicine: [],
+                lastPlayed: [],
+                lastEducated: [],
+                lastWalked: [],
+                lastPat: [],
               },
             },
-            { upsert: true }
-          )
-          .exec();
+          },
+          { upsert: true }
+        ).exec();
 
         await interaction.reply(
           "You have successfully released your pet back into the wild."
@@ -366,18 +162,14 @@ module.exports = {
           "An error occurred while trying to release your pet. Please try again later."
         );
       }
-    }
-    if (subcommand === "adopt") {
+    } else if (subcommand === "adopt") {
       const userId = interaction.user.id;
-
       try {
-        userDb = await userModel
-          .findOneAndUpdate(
-            { userId },
-            {},
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-          )
-          .exec();
+        userDb = await userModel.findOneAndUpdate(
+          { userId },
+          {},
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        ).exec();
       } catch (error) {
         console.error("Create/Fetch User Error >", error);
         await interaction.reply({
@@ -399,6 +191,7 @@ module.exports = {
         });
         return;
       }
+
       const startingEmbed = new EmbedBuilder()
         .setTitle("Welcome to AdoptMe!")
         .setDescription(
@@ -441,3 +234,4 @@ module.exports = {
     }
   },
 };
+
