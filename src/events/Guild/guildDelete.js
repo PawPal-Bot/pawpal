@@ -20,13 +20,10 @@ module.exports = {
         "info"
       );
 
-      // Retrieve the ID and token from environment variables
       const guildActivityWebhookId = process.env.GUILDACTIVITY_WEBHOOK_ID;
       const guildActivityWebhookToken = process.env.GUILDACTIVITY_WEBHOOK_TOKEN;
 
-      // Check if both ID and token are available
       if (guildActivityWebhookId && guildActivityWebhookToken) {
-        // Create a new WebhookClient using the ID and token
         const webhookClient = new WebhookClient({
           id: guildActivityWebhookId,
           token: guildActivityWebhookToken,
@@ -48,7 +45,7 @@ module.exports = {
 
         await webhookClient.send({ embeds: [embed] });
       } else {
-        console.error("Guild activity webhook configuration not found.");
+        log("Guild activity webhook configuration not found.", "error");
       }
     } catch (error) {
       log(`Failed to handle guild delete for ${guild.id}: ${error}`, "error");
