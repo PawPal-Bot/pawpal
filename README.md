@@ -49,7 +49,9 @@ DEVELOPMENT = true/false
 GUILDACTIVITY_WEBHOOK_ID=
 GUILDACTIVITY_WEBHOOK_TOKEN=
 
-````
+```
+
+```
 
 ## Deployment
 
@@ -57,6 +59,6 @@ Start the project using
 
 ```bash
 npm run start
-````
+```
 
 The bot should now be running on your server and ready to interact with your Discord community.
