@@ -1,37 +1,38 @@
 {
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "format": "prettier --write  \"src/**/*.js\""
-  },
-  "dependencies": {
-    "@discordjs/rest": "^1.7.0",
-    "chalk-advanced": "^1.0.6",
-    "discord-api-types": "^0.37.38",
-    "discord.js": "^14.9.0",
-    "dotenv": "^16.0.3",
-    "mongoose": "^7.6.3",
-    "prettier": "^3.0.1",
-    "uuid": "^9.0.1"
-  },
-  "devDependencies": {
-    "nodemon": "2.0.20"
-  },
-  "name": "pawpal",
+  "name": "pawpals",
+  "version": "2.0.0",
   "description": "PawPal is a Discord bot that brings virtual pets, known as PawPals, to your server. Care for your adorable PawPal, watch them grow, play games, and nurture a special digital bond with your furry companion.",
-  "version": "1.0.0",
-  "main": "src/index.js",
+  "author": "SleeplessGaming",
+  "keywords": [],
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PawPal-Bot/pawpal.git"
   },
-  "authors": [
-    "Dominik Koch",
-    "Provant15"
-  ],
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/PawPal-Bot/pawpal/issues"
   },
-  "homepage": "https://github.com/PawPal-Bot/pawpal#readme"
+  "homepage": "https://github.com/PawPal-Bot/pawpal#readme",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon .",
+    "migrate": "node migrateMongo.js && npm run start"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "chalk": "^2.4.2",
+    "discord-canvas": "^1.5.2",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
+    "mongoose": "^7.3.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "authors": [
+    "Dominik Koch",
+    "Provant15"
+  ]
 }

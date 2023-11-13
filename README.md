@@ -1,13 +1,13 @@
- 
 # PawPal - Virtual Pet
 
 Raise a lovable red panda, a playful dog, or an adorable cat in this interactive Discord pet bot!
 
-
 ![PawPal Banner](https://imgur.com/W0AYhUf.png)
+
 ## Requirements
 
 1. **Node.js:** Make sure you have Node.js installed on your system.
+
    - Download and install Node.js from [nodejs.org](https://nodejs.org/).
 
 2. **MongoDB:** You will need a MongoDB database to store pet data.
@@ -25,20 +25,19 @@ Raise a lovable red panda, a playful dog, or an adorable cat in this interactive
 
 2. Install the necessary dependencies
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
+
 3. Create and fill out the .env file
 
-    ```bash
-    TOKEN=
-    GUILD_ID=
-    STATUS=DEVELOPMENT
-    STATUSBOT=adopt a pet
-    DISCORDSTATUS=online
-    MONGO_URI=
-    ```
-
+   ```bash
+   CLIENT_TOKEN =
+   CLIENT_ID =
+   GUILD_ID =
+   DEVELOPMENT = *(boolean)*
+   MONGODB_URI
+   ```
 
 ## Deployment
 
@@ -49,4 +48,3 @@ Start the project using
 ```
 
 The bot should now be running on your server and ready to interact with your Discord community.
-    
