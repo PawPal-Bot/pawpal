@@ -35,19 +35,13 @@ Raise a lovable red panda, a playful dog, or an adorable cat in this interactive
    CLIENT_TOKEN =
    CLIENT_ID =
    MONGODB_URI =
+   GUILD_ID =
+   DEVELOPMENT = true/false
+   ## WEBHOOKS
+   ## Join/Leave Event
+   GUILDACTIVITY_WEBHOOK_ID=
+   GUILDACTIVITY_WEBHOOK_TOKEN=
    ```
-
-// DEVELOPMENT
-
-GUILD_ID =
-DEVELOPMENT = true/false
-
-// WEBHOOKS
-
-// Join/Leave Event
-
-GUILDACTIVITY_WEBHOOK_ID=
-GUILDACTIVITY_WEBHOOK_TOKEN=
 
 ````
 
