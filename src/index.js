@@ -1,6 +1,6 @@
 require('dotenv').config();
 const ExtendedClient = require('./class/ExtendedClient');
-const startIntervals = require("./utils/intervals/startInvervals");
+const startIntervals = require('./utils/intervals/startInvervals');
 
 const client = new ExtendedClient();
 

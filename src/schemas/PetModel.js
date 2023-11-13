@@ -1,11 +1,11 @@
-const { model, Schema } = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
+const { model, Schema } = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const petProfile = new Schema(
   {
     userId: { type: Number, required: true, unique: true },
     petId: { type: String, default: () => uuidv4(), unique: true },
-    petName: { type: String, default: "", maxlength: [25, "Pet name cannot be more than 25 characters"] },
+    petName: { type: String, default: '', maxlength: [25, 'Pet name cannot be more than 25 characters'] },
     petType: { type: Number, default: 0 }, // 0 for none, 1 for dog, 2 for cat, 3 for red panda
     petVariant: { type: Number, default: 0 }, // 0 for default, 1 for variant 1, 2 for variant 2, etc.
     hasPet: { type: Boolean, default: false },
@@ -33,17 +33,19 @@ const petProfile = new Schema(
         isActive: { type: Boolean, default: false },
         attempts: { type: Number, default: 0 },
         isFound: { type: Boolean, default: false },
-        buttonLocations: [{
-          buttonId: String,
-          locationName: String,
-          _id: false
-        }],
+        buttonLocations: [
+          {
+            buttonId: String,
+            locationName: String,
+            _id: false,
+          },
+        ],
       },
       stats: {
         miniGamesPlayed: { type: Number, default: 0 },
         miniGamesWon: { type: Number, default: 0 },
         miniGamesLost: { type: Number, default: 0 },
-      }
+      },
     },
     patCount: { type: Number, default: 0 },
     cuddleCount: { type: Number, default: 0 },
@@ -76,4 +78,4 @@ const petProfile = new Schema(
   },
   { timestamps: true }
 );
-module.exports = model("petProfile", petProfile);
+module.exports = model('petProfile', petProfile);
