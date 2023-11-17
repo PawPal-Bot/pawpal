@@ -1,20 +1,20 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const petProfile = require('../../../schemas/PetModel');
-const speechBubbles = require('../../../data/speechBubbles.json');
-const timeStamp = require('../../../utils/timeStamp');
-const variables = require('../../../data/variableNames');
-const checkPetStatus = require('../../../utils/eventChecks');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require("discord.js");
+const petProfile = require("../../../schemas/PetModel");
+const speechBubbles = require("../../../data/speechBubbles.json");
+const timeStamp = require("../../../utils/timeStamp");
+const variables = require("../../../data/variableNames");
+const checkPetStatus = require("../../../utils/eventChecks");
 
 function getPetSounds(petDb) {
   const petTypeStrMap = {
-    1: 'dog',
-    2: 'cat',
-    3: 'redPanda',
+    1: "dog",
+    2: "cat",
+    3: "redPanda",
   };
 
   const petTypeStr = petTypeStrMap[petDb.petType];
   if (!petTypeStr) {
-    console.error('Invalid pet type:', petDb.petType);
+    console.error("Invalid pet type:", petDb.petType);
     return null;
   }
 
@@ -25,11 +25,11 @@ function getPetSounds(petDb) {
 
 module.exports = {
   structure: new SlashCommandBuilder()
-    .setName('play')
-    .setDescription('Interact with your pet!')
-    .addSubcommand(subcommand => subcommand.setName('pat').setDescription('Pat your pet to show affection'))
-    .addSubcommand(subcommand => subcommand.setName('cuddle').setDescription('Cuddle with your pet to increase bonding'))
-    .addSubcommand(subcommand => subcommand.setName('hideandseek').setDescription('Your pet is hiding, can you find them?')),
+    .setName("play")
+    .setDescription("Interact with your pet!")
+    .addSubcommand(subcommand => subcommand.setName("pat").setDescription("Pat your pet to show affection"))
+    .addSubcommand(subcommand => subcommand.setName("cuddle").setDescription("Cuddle with your pet to increase bonding"))
+    .addSubcommand(subcommand => subcommand.setName("hideandseek").setDescription("Your pet is hiding, can you find them?")),
   /**
    * @param {ExtendedClient} client
    * @param {ChatInputCommandInteraction} interaction
@@ -42,12 +42,12 @@ module.exports = {
       return;
     }
 
-    const petName = petDb.petName || 'Your pet';
+    const petName = petDb.petName || "Your pet";
     const subcommand = interaction.options.getSubcommand();
     const now = Date.now();
     const { petTypeStr, randomPetSound } = getPetSounds(petDb);
     if (!petTypeStr) {
-      await interaction.reply('There was an error with your pet type.');
+      await interaction.reply("There was an error with your pet type.");
       return;
     }
 
@@ -57,13 +57,13 @@ module.exports = {
     }
 
     switch (subcommand) {
-      case 'pat':
+      case "pat":
         await handlePat(interaction, petDb, petName, now, randomPetSound);
         break;
-      case 'cuddle':
+      case "cuddle":
         await handleCuddle(interaction, petDb, petName, now, randomPetSound);
         break;
-      case 'hideandseek':
+      case "hideandseek":
         await handleHideAndSeek(interaction, petDb, petName, now, randomPetSound);
         break;
     }
@@ -86,15 +86,15 @@ async function handlePat(interaction, petDb, petName, now, randomPetSound) {
   }
 
   const patEmbed = new EmbedBuilder()
-    .setColor('#9e38fe')
-    .setTitle('Pat your pet!')
+    .setColor("#9e38fe")
+    .setTitle("Pat your pet!")
     .setDescription(`${randomPetSound}! ${petName} is ready for more pats.`)
     .setFooter({
       text: `Happiness: ${variables.getHappiness(petDb.happiness)}`,
     })
     .setTimestamp();
 
-  const patButton = new ButtonBuilder().setCustomId('pat').setLabel('Pat').setStyle('Primary');
+  const patButton = new ButtonBuilder().setCustomId("pat").setLabel("Pat").setStyle("Primary");
 
   await interaction.reply({
     embeds: [patEmbed],
@@ -143,26 +143,28 @@ async function handleCuddle(interaction, petDb, petName, now, randomPetSound) {
   energyChange = Math.min(20, energyChange);
   energyChange = parseFloat(energyChange.toFixed(2));
 
+  petDb.cuddleCount++;
+
   await petDb.save();
 
   const cuddleEmbed = new EmbedBuilder()
-    .setColor('#9e38fe')
-    .setTitle('Cuddle Time!')
+    .setColor("#9e38fe")
+    .setTitle("Cuddle Time!")
     .setDescription(`${randomPetSound}! You cuddled with ${petName}. It looks very happy!`)
     .addFields(
       {
-        name: 'Energy',
-        value: `${variables.getEnergy(petDb.energy)} (${energyChange >= 0 ? '+' : '-'}${energyChange})`,
+        name: "Energy",
+        value: `${variables.getEnergy(petDb.energy)} (${energyChange >= 0 ? "+" : "-"}${energyChange})`,
         inline: true,
       },
       {
-        name: 'Affection',
-        value: `${variables.getAffection(petDb.affection)} (${affectionChange >= 0 ? '+' : '-'}${affectionChange})`,
+        name: "Affection",
+        value: `${variables.getAffection(petDb.affection)} (${affectionChange >= 0 ? "+" : "-"}${affectionChange})`,
         inline: true,
       },
       {
-        name: 'Happiness',
-        value: `${variables.getHappiness(petDb.happiness)} (${happinessChange >= 0 ? '+' : '-'}${happinessChange})`,
+        name: "Happiness",
+        value: `${variables.getHappiness(petDb.happiness)} (${happinessChange >= 0 ? "+" : "-"}${happinessChange})`,
         inline: true,
       }
     )
@@ -177,16 +179,16 @@ async function handleHideAndSeek(interaction, petDb, petName, now, randomPetSoun
   await interaction.deferReply();
 
   const allLocations = [
-    { emoji: '🛏️', name: 'Bedroom' },
-    { emoji: '🛋️', name: 'Living Room' },
-    { emoji: '🍽️', name: 'Dining Area' },
-    { emoji: '🚿', name: 'Bathroom' },
-    { emoji: '📚', name: 'Study' },
-    { emoji: '🏡', name: 'Backyard' },
-    { emoji: '🌳', name: 'Old Oak Tree' },
-    { emoji: '🌼', name: 'Flower Garden' },
-    { emoji: '🎠', name: 'Playground' },
-    { emoji: '🌿', name: 'Greenhouse' },
+    { emoji: "🛏️", name: "Bedroom" },
+    { emoji: "🛋️", name: "Living Room" },
+    { emoji: "🍽️", name: "Dining Area" },
+    { emoji: "🚿", name: "Bathroom" },
+    { emoji: "📚", name: "Study" },
+    { emoji: "🏡", name: "Backyard" },
+    { emoji: "🌳", name: "Old Oak Tree" },
+    { emoji: "🌼", name: "Flower Garden" },
+    { emoji: "🎠", name: "Playground" },
+    { emoji: "🌿", name: "Greenhouse" },
   ];
 
   const locations = shuffleArray([...allLocations]);
@@ -211,7 +213,7 @@ async function handleHideAndSeek(interaction, petDb, petName, now, randomPetSoun
     { userId: interaction.user.id },
     {
       $set: {
-        'miniGames.hideAndSeek': {
+        "miniGames.hideAndSeek": {
           isActive: true,
           attempts: 0,
           isFound: false,
