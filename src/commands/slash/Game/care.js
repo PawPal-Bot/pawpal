@@ -395,10 +395,12 @@ async function handleVet(interaction, petDb, petName, now) {
     vetFindings = otherFindingsOptions[Math.floor(Math.random() * otherFindingsOptions.length)];
     petDb.isSick = false;
     petDb.medicineCount = (petDb.medicineCount || 0) + 1;
+    petDb.actionTimeStamp.lastMedicine.push(new Date(now).toISOString());
   } else {
     vetFindings = "has a serious condition and needs immediate care";
     petDb.isSick = true;
     petDb.medicineCount = (petDb.medicineCount || 0) + 4;
+    petDb.actionTimeStamp.lastMedicine.push(new Date(now).toISOString());
   }
 
   petDb.vetCount = (petDb.vetCount || 0) + 1;
