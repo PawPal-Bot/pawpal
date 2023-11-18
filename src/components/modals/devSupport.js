@@ -20,7 +20,7 @@ module.exports = {
       const webhookClient = new WebhookClient({ id: supportWebhookId, token: supportWebhookToken });
 
       const embed = new EmbedBuilder()
-        .setColor(Colors.Blue) // Use the Colors enumeration for setting color
+        .setColor(Colors.Blue)
         .setTitle("New Support Request")
         .setDescription(`**Guild Name:** ${guildName}\n**Guild ID:** ${guildId}\n**Issue:** ${issue}\n**Email:** ${email}`)
         .setTimestamp();
