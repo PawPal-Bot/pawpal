@@ -1,20 +1,20 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const petProfile = require('../../../schemas/PetModel');
-const { generateEmbeds, generateButtons } = require('../../../functions/petUtils');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const petProfile = require("../../../schemas/PetModel");
+const { generateEmbeds, generateButtons } = require("../../../functions/petUtils");
 
 module.exports = {
   structure: new SlashCommandBuilder()
-    .setName('pet')
-    .setDescription('Manage your pet!')
+    .setName("pet")
+    .setDescription("Manage your pet!")
     .addSubcommand(subcommand =>
       subcommand
-        .setName('name')
+        .setName("name")
         .setDescription("Set your pet's name")
-        .addStringOption(option => option.setName('name').setDescription('The new name for your pet').setRequired(true))
+        .addStringOption(option => option.setName("name").setDescription("The new name for your pet").setRequired(true))
     )
-    .addSubcommand(subcommand => subcommand.setName('about').setDescription('Get detailed information about your pet'))
-    .addSubcommand(subcommand => subcommand.setName('release').setDescription('Release your pet back into the wild'))
-    .addSubcommand(subcommand => subcommand.setName('adopt').setDescription('Adopt a new pet!')),
+    .addSubcommand(subcommand => subcommand.setName("about").setDescription("Get detailed information about your pet"))
+    .addSubcommand(subcommand => subcommand.setName("release").setDescription("Release your pet back into the wild"))
+    .addSubcommand(subcommand => subcommand.setName("adopt").setDescription("Adopt a new pet!")),
   /**
    * @param {ExtendedClient} client
    * @param {ChatInputCommandInteraction} interaction
@@ -22,7 +22,7 @@ module.exports = {
   run: async (client, interaction) => {
     const subcommand = interaction.options.getSubcommand();
 
-    if (subcommand === 'name') {
+    if (subcommand === "name") {
       const userDb = await petProfile.findOne({ userId: interaction.user.id });
 
       if (!userDb || userDb.petType === 0) {
@@ -33,7 +33,7 @@ module.exports = {
         return;
       }
 
-      const newName = interaction.options.getString('name').trim();
+      const newName = interaction.options.getString("name").trim();
 
       if (newName.length > 25) {
         await interaction.reply({
@@ -55,7 +55,7 @@ module.exports = {
       await userDb.save();
 
       await interaction.reply(`Your pet's name has been set to ${newName}!`);
-    } else if (subcommand === 'about') {
+    } else if (subcommand === "about") {
       const userDb = await petProfile.findOne({ userId: interaction.user.id });
       if (!userDb || userDb.petType === 0) {
         await interaction.reply({
@@ -70,7 +70,7 @@ module.exports = {
         embeds: [embeds[0]],
         components: [generateButtons(0, embeds.length)],
       });
-    } else if (subcommand === 'release') {
+    } else if (subcommand === "release") {
       const userDb = await petProfile.findOne({ userId: interaction.user.id });
 
       if (!userDb || userDb.petType === 0) {
@@ -87,7 +87,7 @@ module.exports = {
             { userId: interaction.user.id },
             {
               $set: {
-                petName: '',
+                petName: "",
                 petType: 0,
                 hasPet: false,
                 lifeStage: 0,
@@ -133,26 +133,26 @@ module.exports = {
           )
           .exec();
 
-        await interaction.reply('You have successfully released your pet back into the wild.');
+        await interaction.reply("You have successfully released your pet back into the wild.");
       } catch (error) {
         console.error(error);
-        await interaction.reply('An error occurred while trying to release your pet. Please try again later.');
+        await interaction.reply("An error occurred while trying to release your pet. Please try again later.");
       }
-    } else if (subcommand === 'adopt') {
+    } else if (subcommand === "adopt") {
       const userId = interaction.user.id;
       try {
         userDb = await petProfile.findOneAndUpdate({ userId }, {}, { upsert: true, new: true, setDefaultsOnInsert: true }).exec();
       } catch (error) {
-        console.error('Create/Fetch User Error >', error);
+        console.error("Create/Fetch User Error >", error);
         await interaction.reply({
-          content: 'An error occurred while processing your request. Please try again later.',
+          content: "An error occurred while processing your request. Please try again later.",
           ephemeral: true,
         });
         return;
       }
 
       if (userDb.hasPet) {
-        const alreadyHavePetEmbed = new EmbedBuilder().setTitle('You already have a pet!').setDescription("You can't adopt another one!").setColor('#ff0000');
+        const alreadyHavePetEmbed = new EmbedBuilder().setTitle("You already have a pet!").setDescription("You can't adopt another one!").setColor("#ff0000");
 
         await interaction.reply({
           embeds: [alreadyHavePetEmbed],
@@ -160,32 +160,32 @@ module.exports = {
         return;
       }
 
-      const startingEmbed = new EmbedBuilder().setTitle('Welcome to PawPal!').setDescription('PawPal is a Discord bot that lets you keep a virtual pet!').setColor('#9e38fe').addFields({
-        name: 'Getting Started',
-        value: 'Choose a pet type to adopt by selecting from the menu below.',
+      const startingEmbed = new EmbedBuilder().setTitle("Welcome to PawPal!").setDescription("PawPal is a Discord bot that lets you keep a virtual pet!").setColor("#9e38fe").addFields({
+        name: "Getting Started",
+        value: "Choose a pet type to adopt by selecting from the menu below.",
       });
 
       const selectMenu = new StringSelectMenuBuilder()
-        .setCustomId('getCreateMenu')
-        .setPlaceholder('Select a pet to adopt!')
+        .setCustomId("getCreateMenu")
+        .setPlaceholder("Select a pet to adopt!")
         .addOptions([
           {
-            label: 'Dog',
-            value: '1',
-            description: 'Adopt a dog!',
-            emoji: '🐶',
+            label: "Dog",
+            value: "1",
+            description: "Adopt a dog!",
+            emoji: "🐶",
           },
           {
-            label: 'Cat',
-            value: '2',
-            description: 'Adopt a cat!',
-            emoji: '🐱',
+            label: "Cat",
+            value: "2",
+            description: "Adopt a cat!",
+            emoji: "🐱",
           },
           {
-            label: 'Red Panda',
-            value: '3',
-            description: 'Adopt a red panda!',
-            emoji: '🐼',
+            label: "Red Panda",
+            value: "3",
+            description: "Adopt a red panda!",
+            emoji: "🐼",
           },
         ]);
 

@@ -17,7 +17,8 @@
   "scripts": {
     "start": "node .",
     "dev": "nodemon .",
-    "migrate": "node migrateMongo.js && npm run start"
+    "migrate": "node migrateMongo.js && npm run start",
+    "format": "prettier --write  \"src/**/*.js\""
   },
   "dependencies": {
     "canvas": "^2.11.2",
@@ -26,10 +27,12 @@
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "mongoose": "^7.3.1",
+
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "prettier": "^3.1.0"
   },
   "authors": [
     "Dominik Koch",

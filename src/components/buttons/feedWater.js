@@ -7,9 +7,9 @@ const variables = require("../../data/variableNames");
 module.exports = {
   customId: "feedWater",
   /**
-   * 
-   * @param {ExtendedClient} client 
-   * @param {ButtonInteraction} interaction 
+   *
+   * @param {ExtendedClient} client
+   * @param {ButtonInteraction} interaction
    */
   run: async (client, interaction) => {
     await interaction.deferUpdate();
@@ -40,22 +40,14 @@ module.exports = {
       return;
     }
 
-    const randomDrinkingSound =
-      speechBubbles.drinkingSounds[
-        Math.floor(Math.random() * speechBubbles.drinkingSounds.length)
-      ];
+    const randomDrinkingSound = speechBubbles.drinkingSounds[Math.floor(Math.random() * speechBubbles.drinkingSounds.length)];
 
-    const randomPetSound =
-      speechBubbles[petTypeStr][
-        Math.floor(Math.random() * speechBubbles[petTypeStr].length)
-      ];
+    const randomPetSound = speechBubbles[petTypeStr][Math.floor(Math.random() * speechBubbles[petTypeStr].length)];
 
     let canDrink = petDb.thirst < 100;
 
     // Filter out the drink timestamps that are within the last 10 minutes
-    const recentDrinks = petDb.actionTimeStamp.lastDrank.filter(
-      (time) => new Date(time).getTime() > timeStamp.tenMinutesAgo()
-    );
+    const recentDrinks = petDb.actionTimeStamp.lastDrank.filter(time => new Date(time).getTime() > timeStamp.tenMinutesAgo());
 
     // If there are 3 or more recent drink times, the pet cannot drink more
     if (recentDrinks.length >= 3) {
@@ -67,9 +59,7 @@ module.exports = {
       const tooMuchDrinkEmbed = new EmbedBuilder()
         .setColor("#9e38fe")
         .setTitle("Oh no!")
-        .setDescription(
-          `${randomPetSound}! ${petName} has had enough to drink recently. Try again later.`
-        )
+        .setDescription(`${randomPetSound}! ${petName} has had enough to drink recently. Try again later.`)
         .setTimestamp();
 
       await interaction.editReply({
@@ -93,9 +83,8 @@ module.exports = {
     petDb.thirst = Math.min(petDb.thirst + increaseThirstBy, 100);
     const energyIncrease = Math.floor(0.3 * increaseThirstBy);
     petDb.energy = Math.min(petDb.energy + energyIncrease, 100);
-    const increaseHappinessBy = Math.floor(Math.random() * 15) +1;
+    const increaseHappinessBy = Math.floor(Math.random() * 15) + 1;
     petDb.happiness = Math.min(petDb.happiness + increaseHappinessBy, 100);
-
 
     petDb.drinkCount += 1;
 
@@ -117,27 +106,20 @@ module.exports = {
     const updatedWaterEmbed = new EmbedBuilder()
       .setColor("#3399ff")
       .setTitle(`You gave ${petName} some water!`)
-      .setDescription(
-        `${randomPetSound}! ${petName} ${randomDrinkingSound}s the water happily! Their thirst level is now ${variables.getThirst(
-          petDb.thirst
-        )}.`
+      .setDescription(`${randomPetSound}! ${petName} ${randomDrinkingSound}s the water happily! Their thirst level is now ${variables.getThirst(petDb.thirst)}.`)
+      .addFields(
+        { name: "Hydration Level", value: `+${increaseThirstBy}`, inline: true },
+        { name: "Happiness", value: `+${increaseHappinessBy}`, inline: true },
+        { name: "Energy", value: `+${energyIncrease}`, inline: true }
       )
-      .addFields({ name:"Hydration Level", value: `+${increaseThirstBy}`, inline: true },
-      { name: "Happiness", value: `+${increaseHappinessBy}`, inline: true },
-      { name: "Energy", value: `+${energyIncrease}`, inline: true },)
-      .setFooter({ text: `Hunger Level: ${variables.getHunger(petDb.hunger)}`,
-      })
+      .setFooter({ text: `Hunger Level: ${variables.getHunger(petDb.hunger)}` })
       .setFooter({
         text: `Thirst Level: ${variables.getThirst(petDb.thirst)}`,
       })
       .setTimestamp();
 
     // Create the button for giving more water
-    const waterAgainButton = new ButtonBuilder()
-      .setCustomId("feedWater")
-      .setLabel("Give More Water")
-      .setStyle("Primary")
-      .setDisabled(!canDrink);
+    const waterAgainButton = new ButtonBuilder().setCustomId("feedWater").setLabel("Give More Water").setStyle("Primary").setDisabled(!canDrink);
 
     // Send the reply with the embed and the button
     await interaction.editReply({

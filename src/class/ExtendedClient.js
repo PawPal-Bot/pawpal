@@ -1,13 +1,13 @@
-const { Client, Partials, Collection, GatewayIntentBits } = require('discord.js');
-const { log } = require('../functions/index');
-const config = require('../config');
-const commands = require('../handlers/commands');
-const events = require('../handlers/events');
-const deploy = require('../handlers/deploy');
-const mongoose = require('../handlers/mongoose');
-const components = require('../handlers/components');
-const PetModel = require('../schemas/PetModel');
-const timeStamp = require('../utils/timeStamp');
+const { Client, Partials, Collection, GatewayIntentBits } = require("discord.js");
+const { log } = require("../functions/index");
+const config = require("../config");
+const commands = require("../handlers/commands");
+const events = require("../handlers/events");
+const deploy = require("../handlers/deploy");
+const mongoose = require("../handlers/mongoose");
+const components = require("../handlers/components");
+const PetModel = require("../schemas/PetModel");
+const timeStamp = require("../utils/timeStamp");
 
 module.exports = class extends Client {
   collection = {
@@ -49,9 +49,9 @@ module.exports = class extends Client {
     try {
       const totalPets = await PetModel.countDocuments();
       await this.user.setActivity(`Enjoying a lovely day in the park with ${totalPets} furry friends`, { type: 4 });
-      log(`Activity updated: ${totalPets} furry friends`, 'done');
+      log(`Activity updated: ${totalPets} furry friends`, "done");
     } catch (error) {
-      log(`Error updating bot activity: ${error}`, 'err');
+      log(`Error updating bot activity: ${error}`, "err");
     }
   };
 };

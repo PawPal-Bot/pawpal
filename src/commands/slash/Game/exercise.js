@@ -1,20 +1,20 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SlashCommandBuilder } = require('discord.js');
-const petProfile = require('../../../schemas/PetModel');
-const speechBubbles = require('../../../data/speechBubbles.json');
-const timeStamp = require('../../../utils/timeStamp');
-const variables = require('../../../data/variableNames');
-const checkPetStatus = require('../../../utils/eventChecks');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SlashCommandBuilder } = require("discord.js");
+const petProfile = require("../../../schemas/PetModel");
+const speechBubbles = require("../../../data/speechBubbles.json");
+const timeStamp = require("../../../utils/timeStamp");
+const variables = require("../../../data/variableNames");
+const checkPetStatus = require("../../../utils/eventChecks");
 
 function getPetSounds(petDb) {
   const petTypeStrMap = {
-    1: 'dog',
-    2: 'cat',
-    3: 'redPanda',
+    1: "dog",
+    2: "cat",
+    3: "redPanda",
   };
 
   const petTypeStr = petTypeStrMap[petDb.petType];
   if (!petTypeStr) {
-    console.error('Invalid pet type:', petDb.petType);
+    console.error("Invalid pet type:", petDb.petType);
     return null;
   }
 
@@ -28,11 +28,11 @@ function getPetSounds(petDb) {
 
 module.exports = {
   structure: new SlashCommandBuilder()
-    .setName('exercise')
-    .setDescription('Interact with your pet!')
-    .addSubcommand(subcommand => subcommand.setName('walk').setDescription('Take your pet for a walk'))
-    .addSubcommand(subcommand => subcommand.setName('run').setDescription('Take your pet for a run'))
-    .addSubcommand(subcommand => subcommand.setName('hunt').setDescription('Take your pet hunting')),
+    .setName("exercise")
+    .setDescription("Interact with your pet!")
+    .addSubcommand(subcommand => subcommand.setName("walk").setDescription("Take your pet for a walk"))
+    .addSubcommand(subcommand => subcommand.setName("run").setDescription("Take your pet for a run"))
+    .addSubcommand(subcommand => subcommand.setName("hunt").setDescription("Take your pet hunting")),
   /**
    * @param {ExtendedClient} client
    * @param {ChatInputCommandInteraction} interaction
@@ -47,14 +47,14 @@ module.exports = {
       return;
     }
 
-    const petName = petDb.petName || 'Your pet';
+    const petName = petDb.petName || "Your pet";
     const subcommand = interaction.options.getSubcommand();
 
     const now = Date.now();
 
     const { petTypeStr, randomPetSound } = getPetSounds(petDb);
     if (!petTypeStr) {
-      await interaction.reply('There was an error with your pet type.');
+      await interaction.reply("There was an error with your pet type.");
       return;
     }
 
@@ -64,13 +64,13 @@ module.exports = {
     }
 
     switch (subcommand) {
-      case 'walk':
+      case "walk":
         await handleWalk(interaction, petDb, petName, now, randomPetSound);
         break;
-      case 'run':
+      case "run":
         await handleRun(interaction, petDb, petName, now, randomPetSound);
         break;
-      case 'hunt':
+      case "hunt":
         await handleHunt(interaction, petDb, petName, now, randomPetSound);
         break;
     }
@@ -121,23 +121,23 @@ async function handleWalk(interaction, petDb, petName, now, randomPetSound) {
 
   // Generate the embed with changes displayed
   const walkEmbed = new EmbedBuilder()
-    .setColor('#9e38fe')
+    .setColor("#9e38fe")
     .setTitle(`${petName} went for a walk!`)
     .setDescription(description)
     .addFields(
       {
-        name: 'Energy',
-        value: `${variables.getEnergy(petDb.energy)} (${energyDecrease > 0 ? '-' : '+'}${energyDecrease})`,
+        name: "Energy",
+        value: `${variables.getEnergy(petDb.energy)} (${energyDecrease > 0 ? "-" : "+"}${energyDecrease})`,
         inline: true,
       },
       {
-        name: 'Affection',
-        value: `${variables.getAffection(petDb.affection)} (${affectionIncrease > 0 ? '+' : ''}${affectionIncrease})`,
+        name: "Affection",
+        value: `${variables.getAffection(petDb.affection)} (${affectionIncrease > 0 ? "+" : ""}${affectionIncrease})`,
         inline: true,
       },
       {
-        name: 'Happiness',
-        value: `${variables.getHappiness(petDb.happiness)} (${happinessIncrease > 0 ? '+' : ''}${happinessIncrease})`,
+        name: "Happiness",
+        value: `${variables.getHappiness(petDb.happiness)} (${happinessIncrease > 0 ? "+" : ""}${happinessIncrease})`,
         inline: true,
       }
     )
@@ -194,23 +194,23 @@ async function handleRun(interaction, petDb, petName, now, randomPetSound) {
 
   // Generate the embed with changes displayed
   const runEmbed = new EmbedBuilder()
-    .setColor('#9e38fe')
+    .setColor("#9e38fe")
     .setTitle(`${petName} went for a run!`)
     .setDescription(description)
     .addFields(
       {
-        name: 'Energy',
-        value: `${variables.getEnergy(petDb.energy)} (${energyDecrease > 0 ? '-' : '+'}${energyDecrease})`,
+        name: "Energy",
+        value: `${variables.getEnergy(petDb.energy)} (${energyDecrease > 0 ? "-" : "+"}${energyDecrease})`,
         inline: true,
       },
       {
-        name: 'Affection',
-        value: `${variables.getAffection(petDb.affection)} (${affectionChange >= 0 ? '+' : ''}${affectionChange})`,
+        name: "Affection",
+        value: `${variables.getAffection(petDb.affection)} (${affectionChange >= 0 ? "+" : ""}${affectionChange})`,
         inline: true,
       },
       {
-        name: 'Happiness',
-        value: `${variables.getHappiness(petDb.happiness)} (${happinessChange >= 0 ? '+' : ''}${happinessChange})`,
+        name: "Happiness",
+        value: `${variables.getHappiness(petDb.happiness)} (${happinessChange >= 0 ? "+" : ""}${happinessChange})`,
         inline: true,
       }
     )
@@ -291,7 +291,7 @@ async function handleHunt(interaction, petDb, petName, now, randomPetSound) {
     redPanda: 0.4,
   };
 
-  const petTypeKey = petDb.petType === 1 ? 'dog' : petDb.petType === 2 ? 'cat' : 'redPanda';
+  const petTypeKey = petDb.petType === 1 ? "dog" : petDb.petType === 2 ? "cat" : "redPanda";
   const huntSuccess = Math.random() < successRates[petTypeKey];
 
   const baseStats = {
@@ -347,43 +347,43 @@ async function handleHunt(interaction, petDb, petName, now, randomPetSound) {
     : huntMessages.failure[petTypeKey][Math.floor(Math.random() * huntMessages.failure[petTypeKey].length)];
 
   const huntEmbed = new EmbedBuilder()
-    .setColor('#9e38fe')
+    .setColor("#9e38fe")
     .setTitle(`${petName} went on a hunt!`)
     .setDescription(huntResultMessage)
     .addFields(
       {
         name: `Energy`,
-        value: `${variables.getEnergy(petDb.energy)} (${energyConsumption > 0 ? '-' : '+'}${Math.abs(energyConsumption)})`,
+        value: `${variables.getEnergy(petDb.energy)} (${energyConsumption > 0 ? "-" : "+"}${Math.abs(energyConsumption)})`,
         inline: true,
       },
       {
         name: `Exercise Level`,
-        value: `${variables.getExercise(petDb.exerciseLevel)} (${exerciseGain > 0 ? '+' : '-'}${Math.abs(exerciseGain)})`,
+        value: `${variables.getExercise(petDb.exerciseLevel)} (${exerciseGain > 0 ? "+" : "-"}${Math.abs(exerciseGain)})`,
         inline: true,
       },
       {
         name: `Hunger`,
-        value: `${variables.getHunger(petDb.hunger)} (${hungerChange > 0 ? '+' : '-'}${Math.abs(hungerChange)})`,
+        value: `${variables.getHunger(petDb.hunger)} (${hungerChange > 0 ? "+" : "-"}${Math.abs(hungerChange)})`,
         inline: true,
       },
       {
         name: `Thirst`,
-        value: `${variables.getThirst(petDb.thirst)} (${thirstChange > 0 ? '+' : '-'}${Math.abs(thirstChange)})`,
+        value: `${variables.getThirst(petDb.thirst)} (${thirstChange > 0 ? "+" : "-"}${Math.abs(thirstChange)})`,
         inline: true,
       },
       {
         name: `Cleanliness`,
-        value: `${variables.getCleanliness(petDb.cleanliness)} (${-Math.round(7 * randomFactor) > 0 ? '-' : '+'}${Math.abs(-Math.round(7 * randomFactor))})`,
+        value: `${variables.getCleanliness(petDb.cleanliness)} (${-Math.round(7 * randomFactor) > 0 ? "-" : "+"}${Math.abs(-Math.round(7 * randomFactor))})`,
         inline: true,
       },
       {
         name: `Affection`,
-        value: `${variables.getAffection(petDb.affection)} (${Math.round(4 * randomFactor) > 0 ? '+' : '-'}${Math.abs(Math.round(4 * randomFactor))})`,
+        value: `${variables.getAffection(petDb.affection)} (${Math.round(4 * randomFactor) > 0 ? "+" : "-"}${Math.abs(Math.round(4 * randomFactor))})`,
         inline: true,
       },
       {
         name: `Sleep Level`,
-        value: `${variables.getSleep(petDb.sleepLevel)} (${-Math.round(15 * randomFactor) > 0 ? '-' : '+'}${Math.abs(-Math.round(15 * randomFactor))})`,
+        value: `${variables.getSleep(petDb.sleepLevel)} (${-Math.round(15 * randomFactor) > 0 ? "-" : "+"}${Math.abs(-Math.round(15 * randomFactor))})`,
         inline: true,
       }
     )

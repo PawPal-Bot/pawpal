@@ -1,8 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const guildSchema = new mongoose.Schema({
+const guildSchema = new mongoose.Schema(
+  {
     _id: String,
     guildName: String,
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('guildProfile', guildSchema);
+module.exports = mongoose.model("guildProfile", guildSchema);

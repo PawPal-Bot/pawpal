@@ -1,140 +1,140 @@
 function getCleanliness(value) {
   if (value >= 80) {
-    return 'Sparkling';
+    return "Sparkling";
   } else if (value >= 60) {
-    return 'Clean';
+    return "Clean";
   } else if (value >= 40) {
-    return 'Tidy';
+    return "Tidy";
   } else if (value >= 25) {
-    return 'Messy';
+    return "Messy";
   } else {
-    return 'Filthy';
+    return "Filthy";
   }
 }
 
 function getHealth(value) {
   if (value >= 90) {
-    return 'Excellent';
+    return "Excellent";
   } else if (value >= 70) {
-    return 'Good';
+    return "Good";
   } else if (value >= 50) {
-    return 'Fair';
+    return "Fair";
   } else if (value >= 30) {
-    return 'Poor';
+    return "Poor";
   } else {
-    return 'Critical';
+    return "Critical";
   }
 }
 
 function getHunger(value) {
   if (value >= 90) {
-    return 'Full';
+    return "Full";
   } else if (value >= 70) {
-    return 'Satisfied';
+    return "Satisfied";
   } else if (value >= 50) {
-    return 'Hungry';
+    return "Hungry";
   } else if (value >= 30) {
-    return 'Starving';
+    return "Starving";
   } else {
-    return 'Empty';
+    return "Empty";
   }
 }
 
 function getThirst(value) {
   if (value >= 90) {
-    return 'Hydrated';
+    return "Hydrated";
   } else if (value >= 70) {
-    return 'Thirsty';
+    return "Thirsty";
   } else if (value >= 50) {
-    return 'Dehydrated';
+    return "Dehydrated";
   } else if (value >= 30) {
-    return 'Parched';
+    return "Parched";
   } else {
-    return 'Dying of Thirst';
+    return "Dying of Thirst";
   }
 }
 
 function getEnergy(value) {
   if (value >= 80) {
-    return 'Energetic';
+    return "Energetic";
   } else if (value >= 60) {
-    return 'Active';
+    return "Active";
   } else if (value >= 40) {
-    return 'Tired';
+    return "Tired";
   } else if (value >= 25) {
-    return 'Exhausted';
+    return "Exhausted";
   } else {
-    return 'Comatose';
+    return "Comatose";
   }
 }
 
 function getAffection(value) {
   if (value >= 80) {
-    return 'Very Affectionate';
+    return "Very Affectionate";
   } else if (value >= 60) {
-    return 'Affectionate';
+    return "Affectionate";
   } else if (value >= 40) {
-    return 'Neutral';
+    return "Neutral";
   } else if (value >= 25) {
-    return 'Distant';
+    return "Distant";
   } else {
-    return 'Hostile';
+    return "Hostile";
   }
 }
 
 function getHappiness(value) {
   if (value >= 80) {
-    return 'Ecstatic';
+    return "Ecstatic";
   } else if (value >= 60) {
-    return 'Happy';
+    return "Happy";
   } else if (value >= 40) {
-    return 'Content';
+    return "Content";
   } else if (value >= 25) {
-    return 'Unhappy';
+    return "Unhappy";
   } else {
-    return 'Miserable';
+    return "Miserable";
   }
 }
 
 function getEducation(value) {
   if (value >= 80) {
-    return 'Highly Educated';
+    return "Highly Educated";
   } else if (value >= 60) {
-    return 'Well-Educated';
+    return "Well-Educated";
   } else if (value >= 40) {
-    return 'Moderately Educated';
+    return "Moderately Educated";
   } else if (value >= 25) {
-    return 'Lowly Educated';
+    return "Lowly Educated";
   } else {
-    return 'Uneducated';
+    return "Uneducated";
   }
 }
 
 function getExercise(value) {
   if (value >= 80) {
-    return 'Very Active';
+    return "Very Active";
   } else if (value >= 60) {
-    return 'Active';
+    return "Active";
   } else if (value >= 40) {
-    return 'Moderately Active';
+    return "Moderately Active";
   } else if (value >= 25) {
-    return 'Sedentary';
+    return "Sedentary";
   } else {
-    return 'Immobile';
+    return "Immobile";
   }
 }
 
 function getSleep(value) {
   if (value >= 80) {
-    return 'Well-Rested';
+    return "Well-Rested";
   } else if (value >= 60) {
-    return 'Resting';
+    return "Resting";
   } else if (value >= 40) {
-    return 'Tired';
+    return "Tired";
   } else if (value >= 25) {
-    return 'Exhausted';
+    return "Exhausted";
   } else {
-    return 'Comatose';
+    return "Comatose";
   }
 }
 

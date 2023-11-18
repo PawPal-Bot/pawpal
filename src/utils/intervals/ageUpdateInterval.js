@@ -7,7 +7,7 @@ module.exports = async function ageUpdateInterval() {
     const petDb = await petProfile.find();
     let updatedCount = 0;
 
-    let operations = petDb.map((pet) => {
+    let operations = petDb.map(pet => {
       if (pet.createdAt instanceof Date && !isNaN(pet.createdAt)) {
         const currentTime = Date.now();
         const timeElapsed = currentTime - pet.createdAt.getTime();
@@ -43,9 +43,7 @@ module.exports = async function ageUpdateInterval() {
 
     updatedCount = operations.length;
 
-    log(
-      `Interval Run Successfully: ${updatedCount} pets updated (age and life stage update)`, 'done'
-    );
+    log(`Interval Run Successfully: ${updatedCount} pets updated (age and life stage update)`, "done");
   } catch (error) {
     console.error("Interval Failed To Run (age and life stage update):", error);
   }

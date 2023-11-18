@@ -6,7 +6,8 @@ module.exports = async function valueDrainInterval() {
   try {
     const petDb = await petProfile.find(); // Assigning the result of petProfile.find() to petDb
 
-    let operations = petDb.map((pet) => { // Renamed user to pet
+    let operations = petDb.map(pet => {
+      // Renamed user to pet
       let happinessDrainRate = 3;
       let affectionDrainRate = 3;
       let energyDrainRate = 3;
@@ -15,13 +16,7 @@ module.exports = async function valueDrainInterval() {
       let cleanlinessDrainRate = 3;
       let sleepLevelDrainRate = 4;
 
-      const lastVetVisitTime = pet.actionTimeStamp.lastVetVisit?.length
-        ? new Date(
-            pet.actionTimeStamp.lastVetVisit[
-              pet.actionTimeStamp.lastVetVisit.length - 1
-            ]
-          ).getTime()
-        : 0;
+      const lastVetVisitTime = pet.actionTimeStamp.lastVetVisit?.length ? new Date(pet.actionTimeStamp.lastVetVisit[pet.actionTimeStamp.lastVetVisit.length - 1]).getTime() : 0;
       const timeSinceLastVetVisit = Date.now() - lastVetVisitTime;
       const sixHoursPassed = timeSinceLastVetVisit >= timeStamp.sixHours();
 
@@ -49,20 +44,17 @@ module.exports = async function valueDrainInterval() {
       }
 
       if (petType !== 2) {
-        if (
-          actionTimeStamp.lastRan > timeStamp.twoHoursAgo() ||
-          actionTimeStamp.lastWalked > timeStamp.twoHoursAgo()
-        ) {
+        if (actionTimeStamp.lastRan > timeStamp.twoHoursAgo() || actionTimeStamp.lastWalked > timeStamp.twoHoursAgo()) {
           happinessDrainRate += 1;
         }
       }
 
       const now = Date.now();
-      
+
       const sleepUntilTime = pet.sleepUntil ? new Date(pet.sleepUntil).getTime() : null;
-      
+
       const hassleepUntilPassed = sleepUntilTime ? now > sleepUntilTime : false;
-      
+
       if (hassleepUntilPassed) {
         pet.isAsleep = false;
         const lastSleptTime = new Date(pet.actionTimeStamp.lastSlept[0]).getTime();
@@ -74,24 +66,14 @@ module.exports = async function valueDrainInterval() {
       }
 
       let update = {
-        isAsleep: pet.isAsleep, 
+        isAsleep: pet.isAsleep,
         happiness: Math.max(pet.happiness - happinessDrainRate, 0),
         affection: Math.max(pet.affection - affectionDrainRate, 0),
-        energy: pet.isSick
-          ? pet.energy
-          : Math.max(pet.energy - energyDrainRate, 0),
-        hunger: pet.isSick
-          ? pet.hunger
-          : Math.max(pet.hunger - hungerDrainRate, 0),
-        thirst: pet.isSick
-          ? pet.thirst
-          : Math.max(pet.thirst - thirstDrainRate, 0),
-        cleanliness: pet.isSick
-          ? pet.cleanliness
-          : Math.max(pet.cleanliness - cleanlinessDrainRate, 0),
-        sleepLevel: pet.isSick
-          ? pet.sleepLevel
-          : Math.max(pet.sleepLevel - sleepLevelDrainRate, 0),
+        energy: pet.isSick ? pet.energy : Math.max(pet.energy - energyDrainRate, 0),
+        hunger: pet.isSick ? pet.hunger : Math.max(pet.hunger - hungerDrainRate, 0),
+        thirst: pet.isSick ? pet.thirst : Math.max(pet.thirst - thirstDrainRate, 0),
+        cleanliness: pet.isSick ? pet.cleanliness : Math.max(pet.cleanliness - cleanlinessDrainRate, 0),
+        sleepLevel: pet.isSick ? pet.sleepLevel : Math.max(pet.sleepLevel - sleepLevelDrainRate, 0),
       };
 
       if (pet.isSick && sixHoursPassed) {
@@ -108,9 +90,7 @@ module.exports = async function valueDrainInterval() {
 
     await petProfile.bulkWrite(operations); // Changed userModel to petProfile
 
-    console.log(
-      `Interval Run Successfully: ${operations.length} pets updated (value drain)`
-    );
+    console.log(`Interval Run Successfully: ${operations.length} pets updated (value drain)`);
   } catch (error) {
     console.error("Interval Failed To Run (value drain):", error);
   }

@@ -33,7 +33,6 @@ Raise a lovable red panda, a playful dog, or an adorable cat in this interactive
 
    ```bash
    CLIENT_TOKEN =
-   CLIENT_ID =
    MONGODB_URI =
 
    ## WEBHOOKS

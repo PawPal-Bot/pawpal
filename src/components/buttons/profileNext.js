@@ -5,12 +5,12 @@ module.exports = {
   customId: "about_next",
   public: false,
   /**
-   * 
-   * @param {ExtendedClient} client 
-   * @param {ButtonInteraction} interaction 
+   *
+   * @param {ExtendedClient} client
+   * @param {ButtonInteraction} interaction
    */
   run: async (client, interaction) => {
-    const parts = interaction.customId.split('_');
+    const parts = interaction.customId.split("_");
     const currentPageIndex = parseInt(parts[2], 10);
     const nextPageIndex = currentPageIndex + 1;
 
@@ -21,7 +21,7 @@ module.exports = {
       if (!petProfile || petProfile.petType === 0) {
         await interaction.reply({
           content: "You don't have a pet to display information for.",
-          ephemeral: true
+          ephemeral: true,
         });
         return;
       }
@@ -37,15 +37,15 @@ module.exports = {
 
       await interaction.update({
         embeds: [embeds[nextPageIndex]],
-        components: [buttons]
+        components: [buttons],
       });
     } catch (error) {
       // Handle any database or other errors that may occur
       console.error("Error in run function:", error);
       await interaction.reply({
         content: "An error occurred while fetching pet data.",
-        ephemeral: true
+        ephemeral: true,
       });
     }
-  }
+  },
 };
