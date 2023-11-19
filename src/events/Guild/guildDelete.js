@@ -1,17 +1,17 @@
 const { log } = require("../../functions");
 const GuildProfile = require("../../schemas/GuildSchema");
 const ExtendedClient = require("../../class/ExtendedClient");
-const { EmbedBuilder, WebhookClient } = require("discord.js");
+const { WebhookClient } = require("discord.js");
 
 module.exports = {
   event: "guildDelete",
   /**
    *
-   * @param {ExtendedClient} _
+   * @param {ExtendedClient} client
    * @param {import('discord.js').Guild} guild
    * @returns
    */
-  run: async (_, guild) => {
+  run: async (client, guild) => {
     try {
       await GuildProfile.findOneAndDelete({ _id: guild.id });
 
@@ -26,9 +26,13 @@ module.exports = {
           token: guildActivityWebhookToken,
         });
 
-        const embed = new EmbedBuilder().setColor(0xff0000).setTitle("Guild Left!").setDescription(`Bot has left ${guild.name}`).setTimestamp();
+        const botName = client.user.username;
+        const guildIconURL = guild.iconURL({ dynamic: true, size: 1024 });
+        const serverCount = client.guilds.cache.size;
+        const messageTitle = `${botName} has left ${guild.name}`;
+        const messageContent = `:red_circle: ${messageTitle}. We are now in ${serverCount} servers.`;
 
-        await webhookClient.send({ embeds: [embed] });
+    await webhookClient.send({ content: messageContent, username: guild.name, avatarURL: guildIconURL });
       } else {
         log("Guild activity webhook configuration not found.", "error");
       }
