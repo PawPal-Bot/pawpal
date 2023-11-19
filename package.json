@@ -17,18 +17,15 @@
   "scripts": {
     "start": "node .",
     "dev": "nodemon .",
-    "migrate": "node migrateMongo.js && npm run start",
     "format": "prettier --write  \"src/**/*.js\""
   },
   "dependencies": {
     "canvas": "^2.11.2",
-    "chalk": "^2.4.2",
     "chalk-advanced": "^1.0.7",
     "discord-canvas": "^1.5.2",
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "mongoose": "^7.3.1",
-
     "uuid": "^9.0.1"
   },
   "devDependencies": {
