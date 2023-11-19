@@ -15,7 +15,7 @@ module.exports = async client => {
     return userID;
   };
 
-  const clientID = getClientID(process.env.TOKEN);
+  const clientID = getClientID(process.env.CLIENT_TOKEN);
 
   const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
 
