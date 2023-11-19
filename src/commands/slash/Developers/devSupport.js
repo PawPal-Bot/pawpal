@@ -4,7 +4,7 @@ const ExtendedClient = require("../../../class/ExtendedClient");
 module.exports = {
   structure: new SlashCommandBuilder()
     .setName("devsupport")
-    .setDescription("Creates a form to send a support request to PawPal developers")
+    .setDescription("Creates a form to send a support or feature request to PawPal developers")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
 
   /**
