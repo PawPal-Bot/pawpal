@@ -24,7 +24,7 @@ module.exports = class extends Client {
 
   constructor() {
     super({
-      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions],
+      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMessages],
       partials: [Partials.Reaction],
       makeCache: manager => {
         switch (manager.name) {
