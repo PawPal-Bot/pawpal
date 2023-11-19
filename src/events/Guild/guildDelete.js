@@ -29,7 +29,7 @@ module.exports = {
           token: publicGuildActivityWebhookToken,
         });
 
-        let features;
+        let features = "";
         if ((guild.features && guild.features.includes("VERIFIED")) || guild.features.includes("PARTNERED")) {
           features = guild.features.includes("VERIFIED") ? `<:verified:1175768226743975986> ` : `<:partnered:1175768227901620254>`;
         }
