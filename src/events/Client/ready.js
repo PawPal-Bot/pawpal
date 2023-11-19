@@ -1,7 +1,7 @@
 const { log } = require("../../functions");
 const GuildProfile = require("../../schemas/GuildSchema");
 const ExtendedClient = require("../../class/ExtendedClient");
-const { AutoPoster } = require('topgg-autoposter')
+const { AutoPoster } = require("topgg-autoposter");
 
 module.exports = {
   event: "ready",
@@ -45,11 +45,11 @@ module.exports = {
         }
       }
 
-      const poster = AutoPoster(process.env.TOPGG_TOKEN, client)
+      const poster = AutoPoster(process.env.TOPGG_TOKEN, client);
 
-      poster.on('posted', (stats) => { 
-        log(`Posted stats to Top.gg | ${stats.serverCount} servers`, "done")
-      })
+      poster.on("posted", stats => {
+        log(`Posted stats to Top.gg | ${stats.serverCount} servers`, "done");
+      });
 
       log("Logged in as: " + client.user.tag, "done");
       log(`Updated or created guild profiles for all valid guilds.`, "done");
