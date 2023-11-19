@@ -1,4 +1,4 @@
-const { Client, Partials, Collection, GatewayIntentBits } = require("discord.js");
+const { Client, Partials, Collection, GatewayIntentBits, LimitedCollection } = require("discord.js");
 const { log } = require("../functions/index");
 const config = require("../config");
 const commands = require("../handlers/commands");
@@ -26,6 +26,37 @@ module.exports = class extends Client {
     super({
       intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions],
       partials: [Partials.Reaction],
+      makeCache: manager => {
+        switch (manager.name) {
+          case "ThreadMemberManager":
+          case "ApplicationCommandManager":
+          case "BaseGuildEmojiManager":
+          case "GuildEmojiManager":
+          case "GuildInviteManager":
+          case "GuildStickerManager":
+          case "StageInstanceManager":
+          case "PresenceManager":
+          case "MessageManager":
+          case "GuildBanManager":
+          case "ThreadManager":
+          case "ReactionUserManager":
+          case "VoiceStateManager":
+          case "AutoModerationRuleManager":
+            return new LimitedCollection({ maxSize: 0 });
+          case "GuildMemberManager":
+            return new LimitedCollection({
+              maxSize: 20000,
+              keepOverLimit: member => member.id === member.client.user.id,
+            });
+          case "UserManager":
+            return new LimitedCollection({
+              maxSize: 20000,
+              keepOverLimit: user => user.id === user.client.user.id,
+            });
+          default:
+            return new Collection();
+        }
+      },
     });
   }
 
