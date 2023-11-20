@@ -1,4 +1,5 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const ExtendedClient = require("../../../class/ExtendedClient");
 const petProfile = require("../../../schemas/PetModel");
 const speechBubbles = require("../../../data/speechBubbles.json");
 const timeStamp = require("../../../utils/timeStamp");
