@@ -15,10 +15,17 @@ module.exports = {
       let component;
 
       const parts = interaction.customId.split("_");
-      const baseCustomId = parts[0];
+      let baseCustomId = parts[0];
+      let pageIndex = NaN;
 
       if (interaction.isButton()) {
-        component = client.collection.components.buttons.get(baseCustomId);
+        component = client.collection.components.buttons.get(interaction.customId);
+
+        if (!component && parts.length > 1) {
+          pageIndex = parseInt(parts[parts.length - 1], 10);
+          baseCustomId = isNaN(pageIndex) ? interaction.customId : parts.slice(0, -1).join("_");
+          component = client.collection.components.buttons.get(baseCustomId);
+        }
       } else if (interaction.isAnySelectMenu()) {
         component = client.collection.components.selects.get(interaction.customId);
       } else if (interaction.isModalSubmit()) {
@@ -27,26 +34,16 @@ module.exports = {
 
       if (component) {
         try {
-          await component.run(client, interaction);
+          if (interaction.isButton() && !isNaN(pageIndex)) {
+            await component.run(client, interaction, pageIndex);
+          } else {
+            await component.run(client, interaction);
+          }
         } catch (error) {
-          console.error(error);
+          log(error.message, "err");
         }
       } else {
-        if (interaction.isButton()) {
-          const pageIndex = parseInt(parts[parts.length - 1], 10);
-          component = client.collection.components.buttons.get(baseCustomId);
-
-          if (component) {
-            try {
-              component.run(client, interaction, pageIndex);
-            } catch (error) {
-              console.error(error);
-            }
-          } else {
-            console.log(`No component found for customId: ${interaction.customId}`);
-          }
-        }
-        // No additional handling for select menus or modals here
+        log(`No component found for customId: ${interaction.customId}`, "err");
       }
     }
   },
