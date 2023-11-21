@@ -10,6 +10,8 @@ module.exports = {
    * @param {ButtonInteraction} interaction
    */
   run: async (client, interaction) => {
+    if (interaction.user.id !== interaction.user.id) { return interaction.reply({ content: "You are not the owner of this button.", ephemeral: true }); }
+    
     const parts = interaction.customId.split("_");
     const currentPageIndex = parseInt(parts[2], 10);
     const previousPageIndex = currentPageIndex - 1;
