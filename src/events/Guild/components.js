@@ -33,12 +33,16 @@ module.exports = {
       }
 
       if (component) {
+        const messageInteraction = interaction.message?.interaction;
+        if (!component.public && (!messageInteraction || messageInteraction.user.id !== interaction.user.id)) {
+          const ownerUsername = messageInteraction ? messageInteraction.user.username : "Unknown User";
+          return await interaction.reply({
+            content: `This component belongs to ${ownerUsername}`,
+            ephemeral: true,
+          });
+        }
         try {
-          if (interaction.isButton() && !isNaN(pageIndex)) {
-            await component.run(client, interaction, pageIndex);
-          } else {
-            await component.run(client, interaction);
-          }
+          await component.run(client, interaction);
         } catch (error) {
           log(error.message, "err");
         }
