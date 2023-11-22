@@ -4,7 +4,7 @@ const variables = require("../../data/variableNames");
 
 module.exports = {
   customId: "hideandseek",
-
+  public: false,
   /**
    * @param {ExtendedClient} client
    * @param {ButtonInteraction} interaction
@@ -15,7 +15,7 @@ module.exports = {
       console.error("Interaction is undefined or null");
       return;
     }
-    
+
     const userId = interaction.user.id;
     const profile = await petProfile.findOne({ userId: userId });
     const miniGameState = profile.miniGames.hideAndSeek;

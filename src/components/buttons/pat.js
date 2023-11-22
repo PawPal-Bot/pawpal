@@ -6,6 +6,7 @@ const variables = require("../../data/variableNames");
 
 module.exports = {
   customId: "pat",
+  public: false,
   /**
    *
    * @param {ExtendedClient} client

@@ -3,6 +3,7 @@ const ExtendedClient = require("../../class/ExtendedClient");
 
 module.exports = {
   customId: "dev-support-modal",
+  public: true,
   /**
    * @param {ExtendedClient} client
    * @param {ModalSubmitInteraction} interaction

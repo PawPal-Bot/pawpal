@@ -10,14 +10,11 @@ module.exports = {
    * @param {ButtonInteraction} interaction
    */
   run: async (client, interaction) => {
-    if (interaction.user.id !== interaction.user.id) { return interaction.reply({ content: "You are not the owner of this button.", ephemeral: true }); }
-    
     const parts = interaction.customId.split("_");
     const currentPageIndex = parseInt(parts[2], 10);
     const nextPageIndex = currentPageIndex + 1;
 
     try {
-      // Use the mongoose connection to fetch the pet profile
       const petProfile = await PetProfile.findOne({ userId: interaction.user.id });
 
       if (!petProfile || petProfile.petType === 0) {
@@ -42,7 +39,6 @@ module.exports = {
         components: [buttons],
       });
     } catch (error) {
-      // Handle any database or other errors that may occur
       console.error("Error in run function:", error);
       await interaction.reply({
         content: "An error occurred while fetching pet data.",

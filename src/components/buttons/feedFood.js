@@ -6,6 +6,7 @@ const variables = require("../../data/variableNames");
 
 module.exports = {
   customId: "feedFood",
+  public: false,
   /**
    *
    * @param {ExtendedClient} client
@@ -18,7 +19,7 @@ module.exports = {
     const petDb = await petProfile.findOne({ userId });
     if (!petDb) {
       console.error("Pet not found:", userId);
-      await interaction.followUp({content: "You don't have a pet to feed!", ephemeral: true});
+      await interaction.followUp({ content: "You don't have a pet to feed!", ephemeral: true });
       return;
     }
 
